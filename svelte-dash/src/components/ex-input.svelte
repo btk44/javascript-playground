@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { accounts, categories, currencies } from './data'
+    import { accounts, categories, currencies } from '../data-fakes/data'
 
     interface Transaction {
         id: number,
@@ -136,11 +136,10 @@
     <br>
     <button on:click={processTransaction}>OK</button>
 </div>
-<style>
+<style lang="scss">
     .main-content { width: 80vw; border: 1px solid black; }
-    div { box-sizing: border-box; }
-    label { display: block; width: 100%; padding: 1px 4px; box-sizing: border-box; font-size: small; margin: 0;}
-    input, select, button { display: block; margin: 4px 0; width: 100%; height: 40px; padding: 1px 4px; box-sizing: border-box;}
+    label { display: block; padding: 1px 4px; font-size: small; margin: 0;}
+    input, select, button { display: block; margin: 4px 0; height: 40px; padding: 1px 4px;}
     .input-section { position: relative;}
     .tip { width: 100%; height: 300px; position: absolute; top: -300px; left: 4px; overflow-y: auto; overflow-x: hidden; border: 1px red solid; background-color: white; font-size: small; padding: 4px;}
 </style>

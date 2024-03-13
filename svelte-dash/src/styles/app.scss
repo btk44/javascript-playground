@@ -1,0 +1,3 @@
+// buttons
+button { font-weight: bold; cursor: pointer; }
+.button-text-only { border-width: 0; background-color: inherit; &:hover { filter: brightness(115%); } &:active { filter: brightness(85%); } }
