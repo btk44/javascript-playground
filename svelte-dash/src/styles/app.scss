@@ -1,3 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+.light-mode{
+    --primary-color: #4b87c3;
+    --primary-color-dark:#456990;
+    --primary-color-light: #d9d9d9;
+    --background-color: #000000;
+    --background-color-control: white;
+    --background-color-selected: lightgray; 
+    --text-color: white;
+    --inverted-text-color: white;
+    --placeholder-text-color: lightgray;
+    --control-box-shadow: 0 2px 3px rgba(0,0,0,0.06);
+}
+
+$primary-color: var(--primary-color);
+$primary-color-dark: var(--primary-color-dark);
+$primary-color-light: var(--primary-color-light);
+$text-color: var(--text-color);
+$inverted-text-color: var(--inverted-text-color);
+$placeholder-text-color: var(--placeholder-text-color);
+$background-color: var(--background-color);
+$background-color-control: var(--background-color-control);
+$background-color-selected: var(--background-color-selected);
+$control-box-shadow: var(--control-box-shadow);
+
+.app { background-color: #76b013; }
+
 // buttons
-button { font-weight: bold; cursor: pointer; }
-.button-text-only { border-width: 0; background-color: inherit; &:hover { filter: brightness(115%); } &:active { filter: brightness(85%); } }
+button { font-weight: bold; text-transform: uppercase; cursor: pointer; color: $text-color; }
+.button-text-only { border-width: 0; background-color: transparent; &:hover { filter: brightness(115%); } &:active { filter: brightness(85%); } }
+
