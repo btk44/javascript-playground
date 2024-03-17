@@ -1,4 +1,11 @@
 <script lang="ts">
+	import Card from "../components/card.svelte"
+    import { transactions, accounts, categories, currencies } from '../data-fakes/data'
+
+    interface Map {
+        [key: string | number]: string | number
+    }
+
     let expandSidebar = false;
     const sidebarButtons = [ 
         { icon: '&#x2661;', text: 'option 1', clickAction: () => { alert("1")}},
@@ -6,6 +13,45 @@
         { icon: '&#x2664;', text: 'option 3', clickAction: () => { alert("3")}},
         { icon: '&#x2667;', text: 'option 4', clickAction: () => { alert("4")}},
     ]
+
+    const formatDate = (date: Date): string => { 
+        const addLeadingZero = (number: number): string =>  number < 10 ? `0${number}` : number.toString()
+
+        return `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth()+1)}/${date.getFullYear()}`
+    } 
+
+    const formatAmount = (amount: number): string => { 
+        return amount < 0 ? amount.toString() : `+${amount}` 
+    }
+
+    const getAccountMap = (): any => { 
+        let accountMap: Map = {}
+        accounts.forEach(a => { accountMap[a.id] = a.name })
+        return accountMap
+     }
+
+     const getCategoryMap = (): Map => { 
+        let categoryMap: Map = {}
+        categories.forEach(c => { categoryMap[c.id] = c.name })
+        return categoryMap
+     }
+
+     const getAccountToCurrencyMap = (): Map => {
+        let accountToCurrencyMap: Map = {}
+        accounts.forEach(a => { accountToCurrencyMap[a.id] = a.currencyId })
+        return accountToCurrencyMap
+     }
+
+     const getCurrencyMap = (): Map => { 
+        let currencyMap: Map = {}
+        currencies.forEach(c => { currencyMap[c.id] = c.code })
+        return currencyMap
+     }
+
+    const accountMap: Map = getAccountMap();
+    const categoryMap: Map = getCategoryMap();
+    const currencyMap: Map = getCurrencyMap();
+    const accountToCurrencyMap: Map = getAccountToCurrencyMap();
 </script>
 
 <div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
@@ -17,7 +63,28 @@
             Page 1
         </button>
     </div>
-    <div class="content"></div>
+    <div class="content">
+        <table>
+            <tr>
+                <th class="align-l">data</th>
+                <th class="align-l">konto</th>
+                <th class="align-l">kategoria</th>
+                <th class="align-l">kwota</th>
+                <th class="align-l">-</th>
+                <th class="align-l">komu / od kogo?</th>
+            </tr>
+            {#each transactions as transaction}
+            <tr>
+                <td class="align-l">{formatDate(transaction.date)}</td>
+                <td class="align-l">{accountMap[transaction.accountId]}</td>
+                <td class="align-l">{categoryMap[transaction.categoryId]}</td>
+                <td class="align-l">{formatAmount(transaction.amount)}</td>
+                <td class="align-l">{currencyMap[accountToCurrencyMap[transaction.accountId]]}</td>
+                <td class="align-l">{transaction.payee}</td>
+            </tr>
+            {/each}
+        </table>
+    </div>
     <div class="sidebar">
         {#each sidebarButtons as button}
         <button class="button-text-only side-button" on:click={button.clickAction}>
@@ -32,7 +99,7 @@
 
     //reset all
     :global(body) { margin: 0; padding: 0; font-family: "Source Code Pro", monospace; font-optical-sizing: auto; font-weight: 500; font-style: normal; }
-	:global(*) { box-sizing: border-box; background-color: transparent;	margin: 0; padding: 0; width: 100%; 
+	:global(*) { box-sizing: border-box; background-color: transparent;	margin: 0; padding: 0;  
                  font-family: inherit; font-optical-sizing: inherit; font-weight: inherit; font-style: inherit; }
 
     //set global styles
@@ -44,12 +111,12 @@
     $side-size: 200px;
 
     .main-page {
-        * {
-            -webkit-transition: all 0.1s ease-in-out;
-            -moz-transition: all 0.1s ease-in-out;
-            -o-transition: all 0.1s ease-in-out;
-            transition: all 0.1s ease-in-out;
-        }
+        // * {
+        //     -webkit-transition: all 0.1s ease-in-out;
+        //     -moz-transition: all 0.1s ease-in-out;
+        //     -o-transition: all 0.1s ease-in-out;
+        //     transition: all 0.1s ease-in-out;
+        // }
     }
 
     button { line-height: $header-size; }
@@ -61,6 +128,7 @@
         background-color: $primary-color; 
         color: $text-color; 
         width: 100vw;
+        box-shadow: 0 1px 3px rgb(50, 48, 48);
     }
     .content { 
         position: fixed; top: 0; left: $header-size;
@@ -70,6 +138,26 @@
         height: 100vh;
         width: calc(100vw - $header-size);
         overflow-y: auto;
+        box-shadow: -1px 0 3px rgb(50, 48, 48);
+        table {
+            width: 100%;
+            padding: 5px;
+            overflow-x: auto;
+            overflow-y: auto;
+            box-shadow: 1px 1px 3px rgb(125, 121, 121);
+            height: 80%;
+            tr {
+                margin: 1px;
+                height: 40px;
+                th {border: 0 solid lightgray; border-width: 0 0 2px 1px; background-color: lightgray;}
+                td,th { padding: 4px 6px;}
+                td { border: 0 lightgray solid; border-width: 1px 0 0 0; }
+                .align-c { text-align: center; }
+                .align-l { text-align: left; }
+                .align-r { text-align: right; }
+            }
+        }
+
     }
     .sidebar { 
         position: fixed; top: 0; left: 0;
