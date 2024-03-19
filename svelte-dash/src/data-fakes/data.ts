@@ -58,3 +58,36 @@ export const transactions: Transaction[] = [
     { id: 131, date: new Date(), accountId: 2, categoryId: 6, amount: -30, payee: 'szkoła', gid: '123', active: true },
     { id: 141, date: new Date(), accountId: 1, categoryId: 6, amount: 30, payee: 'sportowy', gid: '123', active: true },
 ]
+
+interface Map {
+    [key: string | number]: string | number
+}
+
+const getAccountDictionary = (): any => { 
+    let accountMap: Map = {}
+    accounts.forEach(a => { accountMap[a.id] = a.name })
+    return accountMap
+ }
+
+ const getCategoryDictionary = (): Map => { 
+    let categoryMap: Map = {}
+    categories.forEach(c => { categoryMap[c.id] = c.name })
+    return categoryMap
+ }
+
+ const getCurrencyDictionary = (): Map => { 
+    let currencyMap: Map = {}
+    currencies.forEach(c => { currencyMap[c.id] = c.code })
+    return currencyMap
+ }
+
+ const getAccountCurrencyDictionary = (): Map => {
+    let accountToCurrencyMap: Map = {}
+    let currencyDictionary: Map = getCurrencyDictionary()
+    accounts.forEach(a => { accountToCurrencyMap[a.id] = currencyDictionary[a.currencyId] })
+    return accountToCurrencyMap
+ }
+
+ export const accountDictionary = getAccountDictionary()
+ export const categoryDictionary = getCategoryDictionary()
+ export const accountCurrencyDictionary = getAccountCurrencyDictionary()

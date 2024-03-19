@@ -27,6 +27,22 @@ $control-box-shadow: var(--control-box-shadow);
 .app { background-color: #76b013; }
 
 // buttons
-button { font-weight: bold; text-transform: uppercase; cursor: pointer; color: $text-color; }
-.button-text-only { border-width: 0; background-color: transparent; &:hover { filter: brightness(115%); } &:active { filter: brightness(85%); } }
+button { 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    cursor: pointer; color: $text-color; 
+    padding: 5px 15px;
+}
+.button-text-only { border-width: 0; background-color: transparent; 
+    &:hover { filter: brightness(115%); } &:active { filter: brightness(85%); }  
+}
+.button-outlined { border: 2px solid $primary-color-dark; background-color: $background-color; color: $primary-color-dark; 
+    &:hover { background-color: $primary-color; color: $text-color; } &:active { background-color: $primary-color-dark; color: $text-color; } 
+}
+
+// inputs
+input {
+    border: 2px solid $primary-color-dark; 
+    padding: 5px 15px;
+}
 
