@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Card from "../components/card.svelte"
     import { transactions, accountDictionary, categoryDictionary, accountCurrencyDictionary } from '../data-fakes/data'
+	import type { Transaction }  from '../models/transaction'
 
     let expandSidebar = false;
     const sidebarButtons = [ 
@@ -19,6 +19,83 @@
     const formatAmount = (amount: number): string => { 
         return amount < 0 ? amount.toString() : `+${amount}` 
     }
+
+    let currentInput: string;
+    let inputError: string;
+    let transaction: Transaction = { id: 0, date: new Date(), accountId: 0, categoryId: 0, amount: 0, payee: '', gid: '', active: true}
+    let displayTransactions = transactions
+    let editInProgress = false
+
+    const isNumber = (input: string): boolean => { return !isNaN(+input) }
+    const setError = (errorMessage: string | undefined | null): void => { inputError = errorMessage ? errorMessage : '-'}
+
+    const processAccountInput = (inputValue: string): void => {
+        let accountId = 0
+        if(isNumber(inputValue)) accountId = +inputValue
+        if(accountDictionary[accountId]) { 
+            transaction.accountId = accountId
+        }
+        else setError('account id is incorrect')
+    }
+
+    const processCategoryInput = (inputValue: string): void => {
+        let categoryId = 0
+        if(isNumber(inputValue)) categoryId = +inputValue
+        if(categoryDictionary[categoryId]) { 
+            transaction.categoryId = categoryId
+        }
+        else setError('category id is incorrect')
+    }
+    
+    const processAmountInput = (inputValue: string): void => {
+        if(isNumber(inputValue)) transaction.amount = +inputValue
+        else setError('amount is incorrect')
+    }
+
+    const processInput = (event: any) => {
+        //setError(null)
+        const control = event.target
+        const currentFocus = control.selectionStart
+
+        if(currentInput.trim() !== ''){
+            const inputValues = currentInput.match(/\s{0,}[^\s]{1,}/g)
+
+            if(inputValues){
+                if(inputValues[0]) {
+                    processAccountInput(inputValues[0])
+                    // if(currentFocus <= inputValues[0].length) 
+                    //     tipContent = 'a' 
+                }
+                if(inputValues[1]){
+                    processCategoryInput(inputValues[1])
+                    // if(currentFocus > inputValues[0].length && currentFocus <= inputValues[1].length + inputValues[0].length)
+                    //     tipContent = 'c'
+                }
+
+                // if(inputValues[0] && inputValues[1] && currentFocus > inputValues[0].length + inputValues[1].length) 
+                //     tipContent = ''
+
+                if(inputValues[2]) processAmountInput(inputValues[2])
+                transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
+
+                displayTransactions[displayTransactions.length-1] = transaction
+            }
+        }
+    }
+
+    const inputFocus = () => {
+        if(!editInProgress){
+            displayTransactions[displayTransactions.length] = transaction
+            const objDiv = document.getElementById("data")
+            if(objDiv)
+                setTimeout(() => objDiv.scrollTop = objDiv.scrollHeight, 40)
+            editInProgress = true
+        }
+    }
+
+    const addTransaction = () => {
+        transaction = { id: 0, date: new Date(), accountId: 0, categoryId: 0, amount: 0, payee: '', gid: '', active: true}
+    }
 </script>
 
 <div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
@@ -32,7 +109,7 @@
     </div>
     <div class="content">
         <div class="card">
-            <div class="data">
+            <div id="data" class="data">
                 <table>
                     <tr>
                         <th class="align-l">data</th>
@@ -42,21 +119,21 @@
                         <th class="align-l">-</th>
                         <th class="align-l">komu / od kogo?</th>
                     </tr>
-                    {#each transactions as transaction}
+                    {#each displayTransactions as transaction}
                     <tr>
                         <td class="align-l">{formatDate(transaction.date)}</td>
-                        <td class="align-l">{accountDictionary[transaction.accountId]}</td>
-                        <td class="align-l">{categoryDictionary[transaction.categoryId]}</td>
+                        <td class="align-l">{accountDictionary[transaction.accountId] ?? ''}</td>
+                        <td class="align-l">{categoryDictionary[transaction.categoryId] ?? ''}</td>
                         <td class="align-l">{formatAmount(transaction.amount)}</td>
-                        <td class="align-l">{accountCurrencyDictionary[transaction.accountId]}</td>
+                        <td class="align-l">{accountCurrencyDictionary[transaction.accountId] ?? ''}</td>
                         <td class="align-l">{transaction.payee}</td>
                     </tr>
                     {/each}
                 </table>
             </div>
             <div class="action-panel">
-                <input type="text"/>
-                <button class="button-outlined">test</button>
+                <input type="text" name="input" id="input" bind:value={currentInput} on:keyup={processInput} on:mouseup={processInput} on:focus={inputFocus} />
+                <button class="button-outlined" on:click={addTransaction}>test</button>
             </div>
         </div>
     </div>
@@ -124,12 +201,14 @@
                 overflow-y: auto;
                 table {
                     font-size: small;
+                    position: relative;
                     width: 100%;
                     tr {
                         margin: 1px;
                         height: 40px;
                         th {border: 0 solid lightgray; border-width: 0 0 2px 1px; background-color: lightgray;}
                         td,th { padding: 4px 6px;}
+                        th {  position: sticky; top: 0}
                         td { border: 0 lightgray solid; border-width: 1px 0 0 0; }
                         .align-c { text-align: center; }
                         .align-l { text-align: left; }
