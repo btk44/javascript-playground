@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { transactions, accountDictionary, categoryDictionary, accountCurrencyDictionary } from '../data-fakes/data'
-	import type { Transaction }  from '../models/transaction'
-
+    import TransactionInput from '../components/transaction-input.svelte';
+import TransactionTable from '../components/transaction-table.svelte';
+import { transactions } from '../data-fakes/data'
+	import { GetEmptyTransaction } from '../models/transaction';
     let expandSidebar = false;
     const sidebarButtons = [ 
         { icon: '&#x2661;', text: 'option 1', clickAction: () => { alert("1")}},
@@ -10,82 +11,22 @@
         { icon: '&#x2667;', text: 'option 4', clickAction: () => { alert("4")}},
     ]
 
-    const formatDate = (date: Date): string => { 
-        const addLeadingZero = (number: number): string =>  number < 10 ? `0${number}` : number.toString()
-
-        return `${addLeadingZero(date.getDate())}/${addLeadingZero(date.getMonth()+1)}/${date.getFullYear()}`
-    } 
-
-    const formatAmount = (amount: number): string => { 
-        return amount < 0 ? amount.toString() : `+${amount}` 
-    }
-
-    let currentInput: string;
-    let inputError: string;
-    let transaction: Transaction = { id: 0, date: new Date(), accountId: 0, categoryId: 0, amount: 0, payee: '', gid: '', active: true}
     let displayTransactions = transactions
     let editInProgress = false
 
-    const isNumber = (input: string): boolean => { return !isNaN(+input) }
-    const setError = (errorMessage: string | undefined | null): void => { inputError = errorMessage ? errorMessage : '-'}
-
-    const processAccountInput = (inputValue: string): void => {
-        let accountId = 0
-        if(isNumber(inputValue)) accountId = +inputValue
-        if(accountDictionary[accountId]) { 
-            transaction.accountId = accountId
-        }
-        else setError('account id is incorrect')
+    const transactionChange = (event: any) => {
+        displayTransactions[displayTransactions.length-1] = event.detail.transaction // edit existing? +scroll issue
     }
 
-    const processCategoryInput = (inputValue: string): void => {
-        let categoryId = 0
-        if(isNumber(inputValue)) categoryId = +inputValue
-        if(categoryDictionary[categoryId]) { 
-            transaction.categoryId = categoryId
-        }
-        else setError('category id is incorrect')
-    }
-    
-    const processAmountInput = (inputValue: string): void => {
-        if(isNumber(inputValue)) transaction.amount = +inputValue
-        else setError('amount is incorrect')
+    const transactionSubmit = (event: any) => { 
+        transactionChange(event)
+        editInProgress = false
+        transactionEditStart()
     }
 
-    const processInput = (event: any) => {
-        //setError(null)
-        const control = event.target
-        const currentFocus = control.selectionStart
-
-        if(currentInput.trim() !== ''){
-            const inputValues = currentInput.match(/\s{0,}[^\s]{1,}/g)
-
-            if(inputValues){
-                if(inputValues[0]) {
-                    processAccountInput(inputValues[0])
-                    // if(currentFocus <= inputValues[0].length) 
-                    //     tipContent = 'a' 
-                }
-                if(inputValues[1]){
-                    processCategoryInput(inputValues[1])
-                    // if(currentFocus > inputValues[0].length && currentFocus <= inputValues[1].length + inputValues[0].length)
-                    //     tipContent = 'c'
-                }
-
-                // if(inputValues[0] && inputValues[1] && currentFocus > inputValues[0].length + inputValues[1].length) 
-                //     tipContent = ''
-
-                if(inputValues[2]) processAmountInput(inputValues[2])
-                transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
-
-                displayTransactions[displayTransactions.length-1] = transaction
-            }
-        }
-    }
-
-    const inputFocus = () => {
+    const transactionEditStart = () => {
         if(!editInProgress){
-            displayTransactions[displayTransactions.length] = transaction
+            displayTransactions[displayTransactions.length] = GetEmptyTransaction()
             const objDiv = document.getElementById("data")
             if(objDiv)
                 setTimeout(() => objDiv.scrollTop = objDiv.scrollHeight, 40)
@@ -93,8 +34,11 @@
         }
     }
 
-    const addTransaction = () => {
-        transaction = { id: 0, date: new Date(), accountId: 0, categoryId: 0, amount: 0, payee: '', gid: '', active: true}
+    const transactionEditStop = () => {
+        if (editInProgress){
+            displayTransactions.length = displayTransactions.length -1
+            editInProgress = false
+        }
     }
 </script>
 
@@ -110,30 +54,13 @@
     <div class="content">
         <div class="card">
             <div id="data" class="data">
-                <table>
-                    <tr>
-                        <th class="align-l">data</th>
-                        <th class="align-l">konto</th>
-                        <th class="align-l">kategoria</th>
-                        <th class="align-l">kwota</th>
-                        <th class="align-l">-</th>
-                        <th class="align-l">komu / od kogo?</th>
-                    </tr>
-                    {#each displayTransactions as transaction}
-                    <tr>
-                        <td class="align-l">{formatDate(transaction.date)}</td>
-                        <td class="align-l">{accountDictionary[transaction.accountId] ?? ''}</td>
-                        <td class="align-l">{categoryDictionary[transaction.categoryId] ?? ''}</td>
-                        <td class="align-l">{formatAmount(transaction.amount)}</td>
-                        <td class="align-l">{accountCurrencyDictionary[transaction.accountId] ?? ''}</td>
-                        <td class="align-l">{transaction.payee}</td>
-                    </tr>
-                    {/each}
-                </table>
+                <TransactionTable transactions={displayTransactions}></TransactionTable>
             </div>
             <div class="action-panel">
-                <input type="text" name="input" id="input" bind:value={currentInput} on:keyup={processInput} on:mouseup={processInput} on:focus={inputFocus} />
-                <button class="button-outlined" on:click={addTransaction}>test</button>
+                <TransactionInput on:transactionChange={transactionChange} 
+                                  on:transactionSubmit={transactionSubmit} 
+                                  on:transactionEditStart={transactionEditStart}
+                                  on:transactionEditStop={transactionEditStop}></TransactionInput>
             </div>
         </div>
     </div>
@@ -199,28 +126,11 @@
             gap: 10px;
             .data{
                 overflow-y: auto;
-                table {
-                    font-size: small;
-                    position: relative;
-                    width: 100%;
-                    tr {
-                        margin: 1px;
-                        height: 40px;
-                        th {border: 0 solid lightgray; border-width: 0 0 2px 1px; background-color: lightgray;}
-                        td,th { padding: 4px 6px;}
-                        th {  position: sticky; top: 0}
-                        td { border: 0 lightgray solid; border-width: 1px 0 0 0; }
-                        .align-c { text-align: center; }
-                        .align-l { text-align: left; }
-                        .align-r { text-align: right; }
-                    }
-                }
             }
 
             .action-panel{
                 text-align: center;
-                button { line-height: normal; }
-                input { min-width: 300px; }
+                position: relative; 
             }            
         }
 
