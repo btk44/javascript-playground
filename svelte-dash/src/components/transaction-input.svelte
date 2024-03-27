@@ -6,17 +6,22 @@
     const dispatch = createEventDispatcher();
 
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
-    const setError = (errorMessage: string | undefined | null): void => { inputError = errorMessage ? errorMessage : '-'}
+    const resetErrorFlags = () => { accountError = categoryError = amountError = false }
+    let accountError = false
+    let categoryError = false
+    let amountError = false
+
 
     const processAccountInput = (inputValue: string): void => {
         let accountId: number | null = null
         if(isNumber(inputValue)) accountId = +inputValue
         if(accountId != null && accountDictionary[accountId]) { 
             transaction.accountId = accountId
+            accountError = false
         }
         else {
             transaction.accountId = 0
-            setError('account id is incorrect')
+            accountError = true
         }
     }
 
@@ -25,24 +30,27 @@
         if(isNumber(inputValue)) categoryId = +inputValue
         if(categoryId != null && categoryDictionary[categoryId]) { 
             transaction.categoryId = categoryId
+            categoryError = false
         }
         else{
             transaction.categoryId = 0
-            setError('category id is incorrect')
+            categoryError = true
         } 
     }
     
     const processAmountInput = (inputValue: string): void => {
         transaction.amount = 0
-        if(isNumber(inputValue)) transaction.amount = +inputValue
-        else setError('amount is incorrect')
+        if(isNumber(inputValue)){
+            amountError = false
+            transaction.amount = +inputValue
+        } 
+        else amountError = true
     }
 
     const processInput = (event: any) => {
-        setError(null)
-        const control = event.target
+        resetErrorFlags()
 
-        if(currentInput.trim() !== ''){
+        if(currentInput && currentInput.trim() !== ''){
             const inputValues = currentInput.match(/\s{0,}[^\s]{1,}/g)
 
             if(inputValues){
@@ -56,14 +64,32 @@
                 if(inputValues[2]) processAmountInput(inputValues[2])
                 transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
 
-                if(event.key === 'Enter' || event.keyCode === 13){
+                if(event.key === 'Enter'){
+                    if (inputError !== '&nbsp;'){
+                        dispatch('transactionChange', { transaction })
+                        return
+                    }
+
                     dispatch('transactionSubmit', { transaction })
+
+                    // assumption that user will want to enter another transaction for the same account
                     currentInput = `${transaction.accountId} `
                     transaction = { ...GetEmptyTransaction(), accountId: transaction.accountId}
+                    dispatch('transactionChange', { transaction })
                 }
-                else 
+                else if (event.key === "Escape"){
+                    currentInput = ''
+                    resetErrorFlags()
+                    transaction = GetEmptyTransaction()
+                    dispatch('transactionChange', { transaction })
+                }
+                else
                     dispatch('transactionChange', { transaction })
             }
+        }
+        else if (event.key === "Escape") {
+            event.currentTarget.blur()
+            dispatch('transactionEditStop')
         }
     }
 
@@ -71,20 +97,26 @@
     const inputBlur = () => dispatch('transactionEditStop')
 
     let currentInput: string;
-    let inputError: string;
+    let inputError: string = '&nbsp;';
     let transaction: Transaction = GetEmptyTransaction()
 </script>
 
-<input type="text" name="transaction-input" id="transaction-input" 
+<input type="text" name="transaction-input" id="transaction-input" placeholder="wprowadź transakcję" 
         bind:value={currentInput} 
         on:keyup={processInput} 
         on:mouseup={processInput} 
         on:focus={inputFocus}
         on:blur={inputBlur} />
-<label for="transaction-input">test</label>
+        <br>
+<label for="transaction-input">
+    <span class={accountError ? 'error-text': ''}>konto*</span>
+    <span class={categoryError ? 'error-text': ''}>kategoria*</span>
+    <span class={amountError ? 'error-text': ''}>kwota*</span>
+    <span>płatnik</span>
+</label>
 
 <style lang="scss">
-    //@import '../styles/app.scss';
+    @import '../styles/app.scss';
 
-    input { min-width: 300px; min-height: 50px; }
+    input { min-width: 50%; text-align: center; }
 </style>

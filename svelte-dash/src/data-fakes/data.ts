@@ -4,13 +4,13 @@ import type { Currency } from "../models/currency"
 import type { Transaction } from "../models/transaction"
 
 export const accounts: Account[] = [
-    { id: 1, name: 'mBank', amount: 0, currencyId: 1, active: true },
-    { id: 2, name: 'Millenium', amount: 0, currencyId: 1, active: true },
-    { id: 3, name: 'Millenium Profit', amount: 0, currencyId: 1, active: true },
-    { id: 4, name: 'BGZ Optima', amount: 0, currencyId: 1, active: true  },
-    { id: 5, name: 'Alior', amount: 0, currencyId: 1, active: false  },
-    { id: 6, name: 'Aion', amount: 0, currencyId: 2, active: true  },
-    { id: 7, name: 'Millenium Ania', amount: 0, currencyId: 1, active: true  },
+    { id: 1, name: 'mBank', amount: 1000, currencyId: 1, active: true },
+    { id: 2, name: 'Millenium', amount: -4230, currencyId: 1, active: true },
+    { id: 3, name: 'Millenium Profit', amount: 12310, currencyId: 1, active: true },
+    { id: 4, name: 'BGZ Optima', amount: 20, currencyId: 1, active: true  },
+    { id: 5, name: 'Alior', amount: -150, currencyId: 1, active: false  },
+    { id: 6, name: 'Aion', amount: 3650, currencyId: 2, active: true  },
+    { id: 7, name: 'Millenium Ania', amount: 7123, currencyId: 1, active: true  },
 ]
 
 export const currencies: Currency[] = [

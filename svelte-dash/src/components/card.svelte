@@ -6,11 +6,12 @@
     @import '../styles/app.scss';
 
     .card {
-        display: inline-block;
-        height: 40px; width: 100%;
-        margin: 1px 0;
-        background-color: $background-color;
-        border: 1px solid lightgray;
-        box-shadow: 1px 1px 3px rgb(125, 121, 121);
+        padding: 5px;
+        box-shadow: $control-box-shadow;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        height: 100%;
     }
 </style>

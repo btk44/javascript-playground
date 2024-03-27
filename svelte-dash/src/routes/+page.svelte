@@ -1,8 +1,8 @@
 <script lang="ts">
-    import TransactionInput from '../components/transaction-input.svelte';
-import TransactionTable from '../components/transaction-table.svelte';
-import { transactions } from '../data-fakes/data'
-	import { GetEmptyTransaction } from '../models/transaction';
+    import AccountTable from '../components/account-table.svelte';
+import Card from '../components/card.svelte';
+	import TransactionEdit from '../components/transaction-edit.svelte';
+
     let expandSidebar = false;
     const sidebarButtons = [ 
         { icon: '&#x2661;', text: 'option 1', clickAction: () => { alert("1")}},
@@ -10,36 +10,6 @@ import { transactions } from '../data-fakes/data'
         { icon: '&#x2664;', text: 'option 3', clickAction: () => { alert("3")}},
         { icon: '&#x2667;', text: 'option 4', clickAction: () => { alert("4")}},
     ]
-
-    let displayTransactions = transactions
-    let editInProgress = false
-
-    const transactionChange = (event: any) => {
-        displayTransactions[displayTransactions.length-1] = event.detail.transaction // edit existing? +scroll issue
-    }
-
-    const transactionSubmit = (event: any) => { 
-        transactionChange(event)
-        editInProgress = false
-        transactionEditStart()
-    }
-
-    const transactionEditStart = () => {
-        if(!editInProgress){
-            displayTransactions[displayTransactions.length] = GetEmptyTransaction()
-            const objDiv = document.getElementById("data")
-            if(objDiv)
-                setTimeout(() => objDiv.scrollTop = objDiv.scrollHeight, 40)
-            editInProgress = true
-        }
-    }
-
-    const transactionEditStop = () => {
-        if (editInProgress){
-            displayTransactions.length = displayTransactions.length -1
-            editInProgress = false
-        }
-    }
 </script>
 
 <div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
@@ -52,16 +22,15 @@ import { transactions } from '../data-fakes/data'
         </button>
     </div>
     <div class="content">
-        <div class="card">
-            <div id="data" class="data">
-                <TransactionTable transactions={displayTransactions}></TransactionTable>
-            </div>
-            <div class="action-panel">
-                <TransactionInput on:transactionChange={transactionChange} 
-                                  on:transactionSubmit={transactionSubmit} 
-                                  on:transactionEditStart={transactionEditStart}
-                                  on:transactionEditStop={transactionEditStop}></TransactionInput>
-            </div>
+        <div class="transactions">
+            <Card>
+                <TransactionEdit></TransactionEdit>
+            </Card>
+        </div>
+        <div class="accounts">
+            <Card>
+                <AccountTable></AccountTable>
+            </Card>
         </div>
     </div>
     <div class="sidebar">
@@ -117,25 +86,22 @@ import { transactions } from '../data-fakes/data'
         width: calc(100vw - $header-size);
         overflow-y: auto;
         box-shadow: -1px 0 3px rgb(50, 48, 48);
-        .card{
-            max-height: 500px;
-            padding: 5px;
-            box-shadow: 1px 1px 3px rgb(125, 121, 121);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            .data{
-                overflow-y: auto;
-            }
+        display: flex;
+        gap: 10px;
 
-            .action-panel{
-                text-align: center;
-                position: relative; 
-            }            
+        .transactions{
+            width: 70%;
+            height: calc(100vh - $header-size - 20px)
         }
 
-
+        .accounts {
+            width: 30%;
+            //height: calc(100vh - $header-size - 20px)
+        }
     }
+
+
+
     .sidebar { 
         position: fixed; top: 0; left: 0;
         z-index: 1;

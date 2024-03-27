@@ -3,15 +3,21 @@
 .light-mode{
     --primary-color: #4b87c3;
     --primary-color-dark:#456990;
-    --primary-color-light: #d9d9d9;
+    --primary-color-light: #7c9fc1;
     --background-color: #fafafa;
     --background-color-control: white;
     --background-color-selected: lightgray; 
     --text-color: white;
     --inverted-text-color: white;
     --placeholder-text-color: lightgray;
-    --control-box-shadow: 0 2px 3px rgba(0,0,0,0.06);
+    --control-box-shadow: 1px 2px 3px rgb(88, 88, 88);
+    --error-color: rgb(198, 79, 79);
 }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { box-shadow: inset 0 0 5px var(--primary-color-light); }
+::-webkit-scrollbar-thumb { background: var(--primary-color-light); }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
 </style>
 
 <html lang="en">
