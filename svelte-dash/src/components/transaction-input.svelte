@@ -3,10 +3,21 @@
     import { accountDictionary, categoryDictionary } from '../data-fakes/data'
 	import { createEventDispatcher } from 'svelte';
 
+    export const initInput = (initTransaction: Transaction) => {  
+        transaction = initTransaction
+        if(transaction.id > 0){
+            currentInput = `${initTransaction.accountId} ${initTransaction.categoryId} ${initTransaction.amount} ${initTransaction.payee ?? ''}`
+        }
+        else 
+            currentInput =  ''
+    }
+
     const dispatch = createEventDispatcher();
 
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
+    const emptyHtml = '&nbsp;'
+
     let accountError = false
     let categoryError = false
     let amountError = false
@@ -50,6 +61,15 @@
     const processInput = (event: any) => {
         resetErrorFlags()
 
+        let currentInput = event.target.value
+
+        if (event.key === "Escape") {
+            event.target.value = ''
+            resetErrorFlags()
+            event.currentTarget.blur()
+            dispatch('transactionEditCancel')
+        }
+
         if(currentInput && currentInput.trim() !== ''){
             const inputValues = currentInput.match(/\s{0,}[^\s]{1,}/g)
 
@@ -62,52 +82,37 @@
                 }
 
                 if(inputValues[2]) processAmountInput(inputValues[2])
-                transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
+                    transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
 
                 if(event.key === 'Enter'){
-                    if (inputError !== '&nbsp;'){
+                    if (inputError !== emptyHtml){
                         dispatch('transactionChange', { transaction })
                         return
                     }
 
                     dispatch('transactionSubmit', { transaction })
-
-                    // assumption that user will want to enter another transaction for the same account
-                    currentInput = `${transaction.accountId} `
-                    transaction = { ...GetEmptyTransaction(), accountId: transaction.accountId}
-                    dispatch('transactionChange', { transaction })
-                }
-                else if (event.key === "Escape"){
-                    currentInput = ''
-                    resetErrorFlags()
-                    transaction = GetEmptyTransaction()
-                    dispatch('transactionChange', { transaction })
+                    event.target.value = ''
                 }
                 else
                     dispatch('transactionChange', { transaction })
             }
-        }
-        else if (event.key === "Escape") {
-            event.currentTarget.blur()
-            dispatch('transactionEditStop')
         }
     }
 
     const inputFocus = () => dispatch('transactionEditStart')
     const inputBlur = () => dispatch('transactionEditStop')
 
-    let currentInput: string;
-    let inputError: string = '&nbsp;';
     let transaction: Transaction = GetEmptyTransaction()
+    let currentInput: string = ''
+    let inputError: string = emptyHtml;
 </script>
 
 <input type="text" name="transaction-input" id="transaction-input" placeholder="wprowadź transakcję" 
-        bind:value={currentInput} 
         on:keyup={processInput} 
-        on:mouseup={processInput} 
         on:focus={inputFocus}
-        on:blur={inputBlur} />
-        <br>
+        on:blur={inputBlur} 
+        bind:value={currentInput}/>
+<br>
 <label for="transaction-input">
     <span class={accountError ? 'error-text': ''}>konto*</span>
     <span class={categoryError ? 'error-text': ''}>kategoria*</span>

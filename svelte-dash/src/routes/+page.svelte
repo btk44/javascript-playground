@@ -27,11 +27,11 @@ import Card from '../components/card.svelte';
                 <TransactionEdit></TransactionEdit>
             </Card>
         </div>
-        <div class="accounts">
+        <!-- <div class="accounts">
             <Card>
                 <AccountTable></AccountTable>
             </Card>
-        </div>
+        </div> -->
     </div>
     <div class="sidebar">
         {#each sidebarButtons as button}
@@ -46,7 +46,9 @@ import Card from '../components/card.svelte';
     @import "../styles/app.scss";
 
     //reset all
-    :global(body) { margin: 0; padding: 0; font-family: "Source Code Pro", monospace; font-optical-sizing: auto; font-weight: 500; font-style: normal; }
+    //:global(body) { margin: 0; padding: 0; font-family: "Source Code Pro", monospace; font-optical-sizing: auto; font-weight: 500; font-style: normal; }
+    :global(body) { margin: 0; padding: 0; font-family: "Reddit Mono", monospace; font-optical-sizing: auto; font-weight: 500; font-style: normal; }
+    
 	:global(*) { box-sizing: border-box; background-color: transparent;	margin: 0; padding: 0;  
                  font-family: inherit; font-optical-sizing: inherit; font-weight: inherit; font-style: inherit; }
 
@@ -90,7 +92,7 @@ import Card from '../components/card.svelte';
         gap: 10px;
 
         .transactions{
-            width: 70%;
+            width: 100%; //width: 70%;
             height: calc(100vh - $header-size - 20px)
         }
 
