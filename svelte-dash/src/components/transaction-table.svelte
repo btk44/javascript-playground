@@ -4,6 +4,9 @@
 	import { createEventDispatcher } from 'svelte';
 
     export let transactions: Transaction[]
+    export const resetSelection = () => { selectedRow = -1 }
+    let selectedRow = -1
+
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komu / od kogo?'] 
     const dispatch = createEventDispatcher()
 
@@ -17,7 +20,10 @@
         return amount < 0 ? amount.toString() : `+${amount}` 
     }
 
-    const rowDoubleClick = (transaction: Transaction) => { dispatch('transactionDoubleClick', { transaction }) }
+    const rowDoubleClick = (transaction: Transaction, index: number) => { 
+        dispatch('transactionDoubleClick', { transaction }) 
+        selectedRow = index   
+    }
 </script>
 
 <table>
@@ -26,8 +32,8 @@
         <th class="aln-l">{header}</th>
         {/each}
     </tr>
-    {#each transactions as transaction}
-    <tr on:dblclick={() => { rowDoubleClick(transaction) }}>
+    {#each transactions as transaction, index}
+    <tr class={selectedRow === index ? 'selected' : ''} on:dblclick={() => { rowDoubleClick(transaction, index) }}>
         <td class="aln-l w-20">{formatDate(transaction.date)}</td>
         <td class="aln-l w-20">{accountDictionary[transaction.accountId] ?? ''}</td>
         <td class="aln-l w-20">{categoryDictionary[transaction.categoryId] ?? ''}</td>
@@ -41,4 +47,5 @@
 <style lang="scss">
     @import '../styles/app.scss';
     
+    .selected { background-color: $primary-color-light;}
 </style>

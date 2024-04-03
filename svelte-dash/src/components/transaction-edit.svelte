@@ -11,7 +11,7 @@
     let currentTransaction: Transaction = GetEmptyTransaction()
     let currentTransactionBackup: Transaction = GetEmptyTransaction()
 
-    const transactionChange = (event: any) => {
+    const transactionInputChange = (event: any) => {
         const transaction = event.detail.transaction
 
         if(addInProgress)
@@ -21,17 +21,18 @@
             displayTransactions[displayTransactions.indexOf(transaction)] = transaction
     }
 
-    const transactionSubmit = (event: any) => { 
+    const transactionInputSubmit = (event: any) => { 
         if(addInProgress){
-            transactionChange(event)
+            transactionInputChange(event)
             addInProgress = false
             transactionInputStart()
         }
 
         if(editInProgress){
-            transactionChange(event)
+            transactionInputChange(event)
             editInProgress = false
-            transactionInputStop()
+            transactionInputStart()
+            resetSelection()
         }
     }
 
@@ -63,13 +64,14 @@
             currentTransaction = GetEmptyTransaction()
             initTransactionInput(currentTransaction)
             editInProgress = false
+            resetSelection()
         }
 
         if(addInProgress)
             transactionInputStop()
     }
 
-    const transactionRowClick = (event: any) => {
+    const transactionTableRowDbClick = (event: any) => {
         currentTransaction = event.detail.transaction
         currentTransactionBackup = { ...event.detail.transaction }
         initTransactionInput(currentTransaction)
@@ -77,18 +79,20 @@
     } 
 
     let initTransactionInput: any
+    let resetSelection: any
 </script>
 
 <div id="data" class="data">
     <TransactionTable transactions={displayTransactions}
-                      on:transactionDoubleClick={transactionRowClick}></TransactionTable>
+                      on:transactionDoubleClick={transactionTableRowDbClick}
+                      bind:resetSelection></TransactionTable>
 </div>
 <div class="action-panel">
-    <TransactionInput bind:initInput={initTransactionInput}
-                    on:transactionChange={transactionChange} 
-                    on:transactionSubmit={transactionSubmit} 
+    <TransactionInput bind:initTransaction={initTransactionInput}
+                    on:transactionChange={transactionInputChange} 
+                    on:transactionSubmit={transactionInputSubmit} 
                     on:transactionEditStart={transactionInputStart}
-                    on:transactionEditCancel={transactionInputCancel}
+                    on:transactionCancel={transactionInputCancel}
                     on:transactionEditStop={transactionInputStop}></TransactionInput>
 </div>
 

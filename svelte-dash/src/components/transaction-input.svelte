@@ -3,7 +3,7 @@
     import { accountDictionary, categoryDictionary } from '../data-fakes/data'
 	import { createEventDispatcher } from 'svelte';
 
-    export const initInput = (initTransaction: Transaction) => {  
+    export const initTransaction = (initTransaction: Transaction) => {  
         transaction = initTransaction
         if(transaction.id > 0){
             currentInput = `${initTransaction.accountId} ${initTransaction.categoryId} ${initTransaction.amount} ${initTransaction.payee ?? ''}`
@@ -13,7 +13,6 @@
     }
 
     const dispatch = createEventDispatcher();
-
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
     const emptyHtml = '&nbsp;'
@@ -21,7 +20,6 @@
     let accountError = false
     let categoryError = false
     let amountError = false
-
 
     const processAccountInput = (inputValue: string): void => {
         let accountId: number | null = null
@@ -67,7 +65,7 @@
             event.target.value = ''
             resetErrorFlags()
             event.currentTarget.blur()
-            dispatch('transactionEditCancel')
+            dispatch('transactionCancel')
         }
 
         if(currentInput && currentInput.trim() !== ''){
