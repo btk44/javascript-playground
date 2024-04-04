@@ -51,13 +51,6 @@
         }
     }
 
-    const transactionInputStop = () => {
-        if (addInProgress){
-            displayTransactions.length = displayTransactions.length -1
-            addInProgress = false
-        }
-    }
-
     const transactionInputCancel = () => {
         if(editInProgress){
             displayTransactions[displayTransactions.indexOf(currentTransaction)] = currentTransactionBackup
@@ -67,16 +60,23 @@
             resetSelection()
         }
 
-        if(addInProgress)
-            transactionInputStop()
+        cancelAddTransaction()
     }
 
     const transactionTableRowDbClick = (event: any) => {
+        cancelAddTransaction()
         currentTransaction = event.detail.transaction
         currentTransactionBackup = { ...event.detail.transaction }
         initTransactionInput(currentTransaction)
         editInProgress = true
     } 
+
+    const cancelAddTransaction = () => {
+        if (addInProgress){
+            displayTransactions.length = displayTransactions.length -1
+            addInProgress = false
+        }
+    }
 
     let initTransactionInput: any
     let resetSelection: any
@@ -92,8 +92,7 @@
                     on:transactionChange={transactionInputChange} 
                     on:transactionSubmit={transactionInputSubmit} 
                     on:transactionEditStart={transactionInputStart}
-                    on:transactionCancel={transactionInputCancel}
-                    on:transactionEditStop={transactionInputStop}></TransactionInput>
+                    on:transactionCancel={transactionInputCancel}></TransactionInput>
 </div>
 
 <style lang="scss">

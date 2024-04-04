@@ -15,11 +15,12 @@
     const dispatch = createEventDispatcher();
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
-    const emptyHtml = '&nbsp;'
 
     let accountError = false
     let categoryError = false
     let amountError = false
+    $: hasError = categoryError || accountError || amountError
+    $: isEmpty = currentInput.trim() === ''
 
     const processAccountInput = (inputValue: string): void => {
         let accountId: number | null = null
@@ -62,10 +63,8 @@
         let currentInput = event.target.value
 
         if (event.key === "Escape") {
-            event.target.value = ''
-            resetErrorFlags()
+            inputCancel()
             event.currentTarget.blur()
-            dispatch('transactionCancel')
         }
 
         if(currentInput && currentInput.trim() !== ''){
@@ -82,44 +81,62 @@
                 if(inputValues[2]) processAmountInput(inputValues[2])
                     transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
 
-                if(event.key === 'Enter'){
-                    if (inputError !== emptyHtml){
-                        dispatch('transactionChange', { transaction })
-                        return
-                    }
-
-                    dispatch('transactionSubmit', { transaction })
-                    event.target.value = ''
-                }
-                else
-                    dispatch('transactionChange', { transaction })
+                if(event.key === 'Enter') inputSubmit()
+                else inputUpdate()
             }
         }
     }
 
     const inputFocus = () => dispatch('transactionEditStart')
     const inputBlur = () => dispatch('transactionEditStop')
+    const inputUpdate = () => dispatch('transactionChange', { transaction })
+
+    const inputSubmit = () => {
+        if(!hasError && !isEmpty){
+            dispatch('transactionSubmit', { transaction })
+            currentInput = ''
+        }
+    }
+    const inputCancel = () => {
+        currentInput = ''
+        resetErrorFlags()
+        dispatch('transactionCancel')
+    }
 
     let transaction: Transaction = GetEmptyTransaction()
     let currentInput: string = ''
-    let inputError: string = emptyHtml;
 </script>
+<div class="transaction-input">
+    <div class="input-group">
+        <input type="text" name="transaction-input" id="transaction-input" placeholder="wprowadź transakcję" 
+                on:keyup={processInput} 
+                on:focus={inputFocus}
+                on:blur={inputBlur} 
+                bind:value={currentInput}/>
+        <label for="transaction-input">
+            <span class={accountError ? 'error-text': ''}>konto*</span>
+            <span class={categoryError ? 'error-text': ''}>kategoria*</span>
+            <span class={amountError ? 'error-text': ''}>kwota*</span>
+            <span>płatnik</span>
+        </label>
+    </div>
+    <div class="button-group">
+        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isEmpty}>&#x2713;</button>
+        <button class="button-outlined" on:click={inputCancel}>&#x2715;</button>
+    </div>
+</div>
 
-<input type="text" name="transaction-input" id="transaction-input" placeholder="wprowadź transakcję" 
-        on:keyup={processInput} 
-        on:focus={inputFocus}
-        on:blur={inputBlur} 
-        bind:value={currentInput}/>
-<br>
-<label for="transaction-input">
-    <span class={accountError ? 'error-text': ''}>konto*</span>
-    <span class={categoryError ? 'error-text': ''}>kategoria*</span>
-    <span class={amountError ? 'error-text': ''}>kwota*</span>
-    <span>płatnik</span>
-</label>
 
 <style lang="scss">
     @import '../styles/app.scss';
 
-    input { min-width: 50%; text-align: center; }
+    .transaction-input {  
+        display: flex; gap: 5px; flex-direction: row; justify-content: right;
+        .input-group { display: flex; flex-direction: column; align-items: center;
+                       flex-grow: 0; }
+        .button-group { display: flex; gap: inherit; align-items: flex-start; 
+                        flex-grow: 0; }
+    }
+
+    input { width: 400px; text-align: center;}
 </style>

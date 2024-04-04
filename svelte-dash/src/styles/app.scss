@@ -19,15 +19,21 @@ $control-min-height: 38px;
 button { 
     font-weight: bold; 
     text-transform: uppercase; 
-    cursor: pointer; color: $text-color; 
-    padding: 5px 15px;
+    cursor: pointer; 
+    color: $inverted-text-color;
+    padding: 2px 15px;
     min-height: $control-min-height;
 }
 .button-text-only { border-width: 0; background-color: transparent; 
     &:hover { filter: brightness(115%); } &:active { filter: brightness(85%); }  
 }
-.button-outlined { border: 2px solid $primary-color-dark; background-color: $background-color; color: $primary-color-dark; 
-    &:hover { background-color: $primary-color; color: $text-color; } &:active { background-color: $primary-color-dark; color: $text-color; } 
+.button-outlined { border: 1px solid $primary-color-dark; background-color: $background-color; color: $primary-color-dark; 
+    &:hover { background-color: $primary-color; color: $text-color; } 
+    &:active { background-color: $primary-color-dark; color: $text-color; } 
+    &:disabled { 
+        background-color: $primary-color-light;
+        color: $primary-color-dark;
+    }
 }
 
 // inputs
