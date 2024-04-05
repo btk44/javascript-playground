@@ -96,8 +96,8 @@
 </div>
 
 <style lang="scss">
-    //@import '../styles/app.scss';
+    @import '../styles/app.scss';
 
     .data{ overflow-y: auto; }
-    .action-panel{ text-align: center; position: relative; } 
+    .action-panel{ text-align: center; position: relative; border-top: 1px solid $primary-color-light; padding: 10px;} 
 </style>

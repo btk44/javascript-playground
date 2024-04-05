@@ -4,7 +4,7 @@ export interface Transaction {
     accountId: number,
     categoryId: number,
     amount: number,
-    payee: string,
+    comment: string,
     gid: string // this is an extra field to mark multiple connected transactions (like transfers)
     active: boolean
 }
@@ -16,7 +16,7 @@ export function GetEmptyTransaction() : Transaction {
         accountId: 0,
         amount: 0,
         categoryId: 0,
-        payee: '',
+        comment: '',
         gid: '',
         active: true
     }

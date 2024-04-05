@@ -6,7 +6,7 @@
     export const initTransaction = (initTransaction: Transaction) => {  
         transaction = initTransaction
         if(transaction.id > 0){
-            currentInput = `${initTransaction.accountId} ${initTransaction.categoryId} ${initTransaction.amount} ${initTransaction.payee ?? ''}`
+            currentInput = `${initTransaction.accountId} ${initTransaction.categoryId} ${initTransaction.amount} ${initTransaction.comment ?? ''}`
         }
         else 
             currentInput =  ''
@@ -20,9 +20,14 @@
     let categoryError = false
     let amountError = false
     $: hasError = categoryError || accountError || amountError
-    $: isEmpty = currentInput.trim() === ''
+    $: isDataMissing = !(transaction.accountId > 0 && transaction.categoryId > 0)
 
-    const processAccountInput = (inputValue: string): void => {
+    const processAccountInput = (inputValue: string | undefined | null): void => {
+        if(!inputValue){
+            transaction.accountId = 0
+            return
+        }
+        
         let accountId: number | null = null
         if(isNumber(inputValue)) accountId = +inputValue
         if(accountId != null && accountDictionary[accountId]) { 
@@ -35,7 +40,12 @@
         }
     }
 
-    const processCategoryInput = (inputValue: string): void => {
+    const processCategoryInput = (inputValue: string | undefined | null): void => {
+        if(!inputValue){
+            transaction.categoryId = 0
+            return
+        }
+
         let categoryId: number | null = null
         if(isNumber(inputValue)) categoryId = +inputValue
         if(categoryId != null && categoryDictionary[categoryId]) { 
@@ -48,7 +58,12 @@
         } 
     }
     
-    const processAmountInput = (inputValue: string): void => {
+    const processAmountInput = (inputValue: string | undefined | null): void => {
+        if(!inputValue){
+            transaction.amount = 0
+            return
+        }
+
         transaction.amount = 0
         if(isNumber(inputValue)){
             amountError = false
@@ -71,15 +86,13 @@
             const inputValues = currentInput.match(/\s{0,}[^\s]{1,}/g)
 
             if(inputValues){
-                if(inputValues[0]) {
-                    processAccountInput(inputValues[0])
-                }
-                if(inputValues[1]){
-                    processCategoryInput(inputValues[1])
-                }
+                processAccountInput(inputValues[0])
+                processCategoryInput(inputValues[1])
+                processAmountInput(inputValues[2])
 
-                if(inputValues[2]) processAmountInput(inputValues[2])
-                    transaction.payee = currentInput.replace(inputValues[0], '').replace(inputValues[1], '').replace(inputValues[2], '').trim()
+                transaction.comment = currentInput.replace(inputValues[0], '')
+                                                  .replace(inputValues[1], '')
+                                                  .replace(inputValues[2], '').trim()
 
                 if(event.key === 'Enter') inputSubmit()
                 else inputUpdate()
@@ -92,7 +105,7 @@
     const inputUpdate = () => dispatch('transactionChange', { transaction })
 
     const inputSubmit = () => {
-        if(!hasError && !isEmpty){
+        if(!hasError && !isDataMissing){
             dispatch('transactionSubmit', { transaction })
             currentInput = ''
         }
@@ -121,7 +134,7 @@
         </label>
     </div>
     <div class="button-group">
-        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isEmpty}>&#x2713;</button>
+        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isDataMissing}>&#x2713;</button>
         <button class="button-outlined" on:click={inputCancel}>&#x2715;</button>
     </div>
 </div>
@@ -139,4 +152,5 @@
     }
 
     input { width: 400px; text-align: center;}
+    label { margin-top: 5px;}
 </style>

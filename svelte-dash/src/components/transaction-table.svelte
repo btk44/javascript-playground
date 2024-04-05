@@ -7,7 +7,7 @@
     export const resetSelection = () => { selectedRow = -1 }
     let selectedRow = -1
 
-    const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komu / od kogo?'] 
+    const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const dispatch = createEventDispatcher()
 
     const formatDate = (date: Date): string => { 
@@ -39,7 +39,7 @@
         <td class="aln-l w-20">{categoryDictionary[transaction.categoryId] ?? ''}</td>
         <td class="aln-l w-10">{formatAmount(transaction.amount)}</td>
         <td class="aln-l w-10">{accountCurrencyDictionary[transaction.accountId] ?? ''}</td>
-        <td class="aln-l w-20">{transaction.payee}</td>
+        <td class="aln-l w-20">{transaction.comment}</td>
     </tr>
     {/each}
 </table>
@@ -47,5 +47,5 @@
 <style lang="scss">
     @import '../styles/app.scss';
     
-    .selected { background-color: $primary-color-light;}
+    .selected { background-color: $accent-color-light;}
 </style>

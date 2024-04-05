@@ -12,7 +12,7 @@ import Card from '../components/card.svelte';
     ]
 </script>
 
-<div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
+<!-- <div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
     <div class="header">
         <button on:click={() => { expandSidebar = !expandSidebar}} class="button-text-only header-menu-button">
             {#if expandSidebar} &#x276E; {:else} &#x2630; {/if} 
@@ -27,11 +27,6 @@ import Card from '../components/card.svelte';
                 <TransactionEdit></TransactionEdit>
             </Card>
         </div>
-        <!-- <div class="accounts">
-            <Card>
-                <AccountTable></AccountTable>
-            </Card>
-        </div> -->
     </div>
     <div class="sidebar">
         {#each sidebarButtons as button}
@@ -40,6 +35,11 @@ import Card from '../components/card.svelte';
         </button>
         {/each}
     </div>
+</div> -->
+<div class="test">
+    <Card>
+        <TransactionEdit></TransactionEdit>
+    </Card>
 </div>
 
 <style lang="scss">
@@ -59,6 +59,11 @@ import Card from '../components/card.svelte';
     // main page styles
     $header-size: 60px;
     $side-size: 200px;
+
+    .test { 
+            margin: 3px;            
+            width: calc(100vw - 10px);
+            height: calc(100vh - 10px) }
 
     .main-page {
         // * {

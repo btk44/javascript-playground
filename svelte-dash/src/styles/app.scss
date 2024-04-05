@@ -4,6 +4,9 @@
 $primary-color: var(--primary-color);
 $primary-color-dark: var(--primary-color-dark);
 $primary-color-light: var(--primary-color-light);
+$accent-color: var(--accent-color);
+$accent-color-dark: var(--accent-color-dark);
+$accent-color-light: var(--accent-color-light);
 $text-color: var(--text-color);
 $inverted-text-color: var(--inverted-text-color);
 $placeholder-text-color: var(--placeholder-text-color);
@@ -31,8 +34,9 @@ button {
     &:hover { background-color: $primary-color; color: $text-color; } 
     &:active { background-color: $primary-color-dark; color: $text-color; } 
     &:disabled { 
-        background-color: $primary-color-light;
-        color: $primary-color-dark;
+        color: $primary-color-light;
+        border-color: $primary-color-light;
+        &:hover { background-color: transparent; color: $primary-color-light; }
     }
 }
 
@@ -55,8 +59,8 @@ table {
         margin: 1px;
         height: $control-min-height;
         td,th { padding: 4px 6px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 0;}
-        th { position: sticky; top: 0; border: 0 solid transparent; border-width: 0 0 2px 1px; background-color: $primary-color-dark; color: $text-color;}
-        td { border: 0 $primary-color-light solid; border-width: 0 0 1px 0; }
+        th { position: sticky; top: 0; border: 0 solid transparent; border-width: 0 0 2px 1px; background-color: $primary-color; color: $text-color;}
+        td { border: 0 $accent-color-light solid; border-width: 0 0 1px 0; }
     }
 }
 
