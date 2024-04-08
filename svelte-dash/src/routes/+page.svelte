@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
     import AccountTable from '../components/account-table.svelte';
-import Card from '../components/card.svelte';
+    import Card from '../components/card.svelte';
 	import TransactionEdit from '../components/transaction-edit.svelte';
+    import { initDataStore } from '../services/data-store'
 
     let expandSidebar = false;
     const sidebarButtons = [ 
@@ -10,6 +12,8 @@ import Card from '../components/card.svelte';
         { icon: '&#x2664;', text: 'option 3', clickAction: () => { alert("3")}},
         { icon: '&#x2667;', text: 'option 4', clickAction: () => { alert("4")}},
     ]
+
+    onMount(() => { initDataStore(1) })
 </script>
 
 <!-- <div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
