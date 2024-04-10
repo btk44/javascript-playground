@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Transaction }  from '../models/transaction'
-    import { accountDictionary, categoryDictionary, accountCurrencyDictionary } from '../data-fakes/data'
+    import { getStoreAccounts, getStoreCategories, getStoreCurrencies } from '../services/data-store'
 	import { createEventDispatcher } from 'svelte';
 
     export let transactions: Transaction[]
@@ -9,6 +9,14 @@
 
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const dispatch = createEventDispatcher()
+    const accounts = getStoreAccounts()
+    const categories = getStoreCategories()
+    const accountCurrencyMap = (() => {
+        let accountToCurrencyMap = {}
+        let currencyDictionary = getStoreCurrencies()
+        Object.keys(accounts).forEach(accKey => { accountToCurrencyMap[accKey] = currencyDictionary[accounts[accKey].currencyId].code })
+        return accountToCurrencyMap
+    })()
 
     const formatDate = (date: Date): string => { 
         const addLeadingZero = (number: number): string =>  number < 10 ? `0${number}` : number.toString()
@@ -35,10 +43,10 @@
     {#each transactions as transaction, index}
     <tr class={selectedRow === index ? 'selected' : ''} on:dblclick={() => { rowDoubleClick(transaction, index) }}>
         <td class="aln-l w-20">{formatDate(transaction.date)}</td>
-        <td class="aln-l w-20">{accountDictionary[transaction.accountId] ?? ''}</td>
-        <td class="aln-l w-20">{categoryDictionary[transaction.categoryId] ?? ''}</td>
+        <td class="aln-l w-20">{accounts[transaction.accountId]?.name ?? ''}</td>
+        <td class="aln-l w-20">{categories[transaction.categoryId]?.name ?? ''}</td>
         <td class="aln-l w-10">{formatAmount(transaction.amount)}</td>
-        <td class="aln-l w-10">{accountCurrencyDictionary[transaction.accountId] ?? ''}</td>
+        <td class="aln-l w-10">{accountCurrencyMap[transaction.accountId] ?? ''}</td>
         <td class="aln-l w-20">{transaction.comment}</td>
     </tr>
     {/each}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GetEmptyTransaction, type Transaction }  from '../models/transaction'
-    import { accountDictionary, categoryDictionary } from '../data-fakes/data'
+    import { getStoreAccounts, getStoreCategories } from '../services/data-store'
 	import { createEventDispatcher } from 'svelte';
 
     export const initTransaction = (initTransaction: Transaction) => {  
@@ -15,6 +15,8 @@
     const dispatch = createEventDispatcher();
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
+    const accounts = getStoreAccounts()
+    const categories = getStoreCategories()
 
     let accountError = false
     let categoryError = false
@@ -30,7 +32,7 @@
         
         let accountId: number | null = null
         if(isNumber(inputValue)) accountId = +inputValue
-        if(accountId != null && accountDictionary[accountId]) { 
+        if(accountId != null && accounts[accountId]) { 
             transaction.accountId = accountId
             accountError = false
         }
@@ -48,7 +50,7 @@
 
         let categoryId: number | null = null
         if(isNumber(inputValue)) categoryId = +inputValue
-        if(categoryId != null && categoryDictionary[categoryId]) { 
+        if(categoryId != null && categories[categoryId]) { 
             transaction.categoryId = categoryId
             categoryError = false
         }

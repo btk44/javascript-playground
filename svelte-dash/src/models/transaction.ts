@@ -1,4 +1,5 @@
 export interface Transaction {
+    ownerId: number,
     id: number,
     date: Date,
     accountId: number,
@@ -11,6 +12,7 @@ export interface Transaction {
 
 export function GetEmptyTransaction() : Transaction {
     return {
+        ownerId: 1,
         id: 0,
         date: new Date(),
         accountId: 0,

@@ -1,15 +1,22 @@
 <script lang="ts">
-	import { transactions } from '../data-fakes/data'
+	import { onMount } from 'svelte';
     import { type Transaction } from '../models/transaction'
 	import { GetEmptyTransaction } from '../models/transaction'
+	import { TransactionService } from '../services/transaction-service';
 	import TransactionInput from './transaction-input.svelte'
 	import TransactionTable from './transaction-table.svelte'
 
-    let displayTransactions = transactions
+    let displayTransactions: Array<Transaction> = []
     let addInProgress = false
     let editInProgress = false
     let currentTransaction: Transaction = GetEmptyTransaction()
     let currentTransactionBackup: Transaction = GetEmptyTransaction()
+    let dataLoaded = false
+
+    onMount(async () => { 
+        displayTransactions = await TransactionService.SearchTransactions({ownerId: 1, take: 100, offset: 0})
+        dataLoaded = true
+    })
 
     const transactionInputChange = (event: any) => {
         const transaction = event.detail.transaction
@@ -23,12 +30,16 @@
 
     const transactionInputSubmit = (event: any) => { 
         if(addInProgress){
+            TransactionService.SaveTransactions([currentTransaction]).then((args) => {
+                let x = 10
+            })
             transactionInputChange(event)
             addInProgress = false
             transactionInputStart()
         }
 
         if(editInProgress){
+            TransactionService.SaveTransactions([currentTransaction])
             transactionInputChange(event)
             editInProgress = false
             transactionInputStart()
@@ -81,7 +92,7 @@
     let initTransactionInput: any
     let resetSelection: any
 </script>
-
+{#if dataLoaded}
 <div id="data" class="data">
     <TransactionTable transactions={displayTransactions}
                       on:transactionDoubleClick={transactionTableRowDbClick}
@@ -94,7 +105,7 @@
                     on:transactionEditStart={transactionInputStart}
                     on:transactionCancel={transactionInputCancel}></TransactionInput>
 </div>
-
+{/if}
 <style lang="scss">
     @import '../styles/app.scss';
 

@@ -13,7 +13,19 @@
         { icon: '&#x2667;', text: 'option 4', clickAction: () => { alert("4")}},
     ]
 
-    onMount(() => { initDataStore(1) })
+    let dataLoaded = false
+
+    onMount(async () => { 
+        try{
+            let result = await initDataStore(1, true)
+            dataLoaded = true
+        }
+        catch(error){
+            dataLoaded = false
+        }
+    })
+    // LOADING animation!
+
 </script>
 
 <!-- <div class={'main-page' + (expandSidebar ? ' with-sidebar-expanded' : '')}>
@@ -41,9 +53,11 @@
     </div>
 </div> -->
 <div class="test">
+    {#if dataLoaded}
     <Card>
         <TransactionEdit></TransactionEdit>
     </Card>
+    {/if}
 </div>
 
 <style lang="scss">

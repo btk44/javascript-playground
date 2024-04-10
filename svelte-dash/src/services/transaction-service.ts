@@ -13,13 +13,19 @@ export const TransactionService = {
     currencyUrl: 'Currency',
 
     SearchTransactions: async function(filters?: TransactionSearchFilters) {    
-        return await this.Search(`${this.apiUrl}/${this.transactionUrl}`, { ...(filters || {}) })
+        try{
+            const response = await this.Search(`${this.apiUrl}/${this.transactionUrl}`, { ...(filters || {}) })
+            return response.map((t: Transaction) => { return { ...t, date: new Date(t.date)} })
+        } catch(error) {
+            return []
+        }
     },
 
     SaveTransactions: async function(transactions: Array<Transaction>) {    
         try{
             const processInput = { transactions: transactions }
-            const response = await fetch(`${this.apiUrl}/${this.transactionUrl}/process`, { method: 'POST', body: JSON.stringify(processInput) })
+            const response = await fetch(`${this.apiUrl}/${this.transactionUrl}/process`, 
+                                        { method: 'POST', body: JSON.stringify(processInput), headers: this.GetHeaders() })
             return await response.json()
         } catch(error) {
             return []

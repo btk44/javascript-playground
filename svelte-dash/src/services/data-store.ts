@@ -21,23 +21,87 @@ const globalStore: DataStore = {
     currencies: []
 }
 
+const loadFromLocalStorage = (key: string, additionalActionOnValue: any = null) => {
+  const localStorageString = localStorage.getItem(key)
+  if (localStorageString !== null) {
+    const value = JSON.parse(localStorageString)
+    if(additionalActionOnValue !== null)
+      additionalActionOnValue(value)
+    globalStore[key] = value
+  }
+}
+
+const saveToLocalStorage = (key: string, value: any) => {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+const saveGlobalStoreToLS = () => {
+    saveToLocalStorage('accounts', globalStore.accounts)
+    saveToLocalStorage('categories', globalStore.categories)
+    saveToLocalStorage('currencies', globalStore.currencies)
+    saveToLocalStorage('last-init', globalStore.lastInit)
+}
+
+const getGlobalStoreFromLS = () => {
+    loadFromLocalStorage('accounts')
+    loadFromLocalStorage('categories')
+    loadFromLocalStorage('currencies')
+    getLastInitTime()
+}
+
+const getLastInitTime = () => { loadFromLocalStorage('last-init', (dateString: string) => { globalStore.lastInit = new Date(dateString) }) }
+
 export const initDataStore = async (ownerId: number, forceReload?: boolean) => {
+  getLastInitTime()
   let now = new Date()
   let timePastLastInitInMin = (+now - +globalStore.lastInit) / 1000 / 60
 
-  if(timePastLastInitInMin < 5 && !forceReload)
-    return Promise.resolve()
+  if(timePastLastInitInMin < 15 && !forceReload){
+      getGlobalStoreFromLS()
+      return await Promise.resolve()
+  }
+
+  globalStore.loading = true
 
   const accountsCall = TransactionService.SearchAccounts({ownerId: ownerId})
   const categoryCall = TransactionService.SearchCategories({ownerId: ownerId})
   const currencyCall = TransactionService.SearchCurrencies()
 
-  Promise
-    .all([accountsCall, categoryCall, currencyCall])
-    .then(([accountsResponse, categoriesResponse, currencyResponse]) => {
-      globalStore.accounts = Object.assign({}, ...accountsResponse.map((x: Account) => ({[x.id]: x})))
-      globalStore.categories = Object.assign({}, ...categoriesResponse.map((x: Category) => ({[x.id]: x})))
-      globalStore.currencies = Object.assign({}, ...currencyResponse.map((x: Currency) => ({[x.id]: x})))
-    })
-    .catch(() => alert('There was an error loading data!'))
+  try{
+    let [accountsResponse, categoriesResponse, currencyResponse] = await Promise.all([accountsCall, categoryCall, currencyCall])
+    globalStore.accounts = Object.assign({}, ...accountsResponse.map((x: Account) => ({[x.id]: x})))
+    globalStore.categories = Object.assign({}, ...categoriesResponse.map((x: Category) => ({[x.id]: x})))
+    globalStore.currencies = Object.assign({}, ...currencyResponse.map((x: Currency) => ({[x.id]: x})))
+    globalStore.loading = false
+    globalStore.lastInit = new Date()
+    saveGlobalStoreToLS()
+    return true
+  }
+  catch(error){
+      globalStore.loading = false
+      alert('There was an error loading data!')
+      return false
+  }
+
+  // return Promise
+  //   .all([accountsCall, categoryCall, currencyCall])
+  //   .then(([accountsResponse, categoriesResponse, currencyResponse]) => {
+  //     globalStore.accounts = Object.assign({}, ...accountsResponse.map((x: Account) => ({[x.id]: x})))
+  //     globalStore.categories = Object.assign({}, ...categoriesResponse.map((x: Category) => ({[x.id]: x})))
+  //     globalStore.currencies = Object.assign({}, ...currencyResponse.map((x: Currency) => ({[x.id]: x})))
+  //     globalStore.loading = false
+  //     globalStore.lastInit = new Date()
+  //     saveGlobalStoreToLS()
+
+  //     return true
+  //   })
+  //   .catch(() => {
+  //     globalStore.loading = false
+  //     alert('There was an error loading data!')
+  //     return false
+  //   })
 }
+
+export const getStoreAccounts = () => { return structuredClone(globalStore.accounts) }
+export const getStoreCategories = () => { return structuredClone(globalStore.categories) }
+export const getStoreCurrencies = () => { return structuredClone(globalStore.currencies) }
