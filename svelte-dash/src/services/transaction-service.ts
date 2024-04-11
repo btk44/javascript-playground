@@ -16,8 +16,9 @@ export const TransactionService = {
         try{
             const response = await this.Search(`${this.apiUrl}/${this.transactionUrl}`, { ...(filters || {}) })
             return response.map((t: Transaction) => { return { ...t, date: new Date(t.date)} })
-        } catch(error) {
-            return []
+        } catch(e) {
+            console.log('Transaction search failed')
+            throw e
         }
     },
 
@@ -27,39 +28,47 @@ export const TransactionService = {
             const response = await fetch(`${this.apiUrl}/${this.transactionUrl}/process`, 
                                         { method: 'POST', body: JSON.stringify(processInput), headers: this.GetHeaders() })
             return await response.json()
-        } catch(error) {
-            return []
+        } catch(e) {
+            console.log('Transaction save failed')
+            throw e
         }
     },
 
     SearchAccounts: async function(filters?: AccountSearchFilters) {    
-        return await this.Search(`${this.apiUrl}/${this.accountUrl}`, { ...(filters || {}) })
+        try{
+            return await this.Search(`${this.apiUrl}/${this.accountUrl}`, { ...(filters || {}) })
+        } catch(e) {
+            console.log('Account search failed')
+            throw e
+        }
     },
 
     SearchCategories: async function(filters?: CategorySearchFilters) {    
-        return await this.Search(`${this.apiUrl}/${this.categoryUrl}`, { ...(filters || {}) })
+        try{
+            return await this.Search(`${this.apiUrl}/${this.categoryUrl}`, { ...(filters || {}) })
+        } catch(e) {
+            console.log('Category search failed')
+            throw e
+        }
     },
 
     SearchCurrencies: async function(filters?: CurrencySearchFilters) {    
-        return await this.Search(`${this.apiUrl}/${this.currencyUrl}`, { ...(filters || {}) })
+        try{
+            return await this.Search(`${this.apiUrl}/${this.currencyUrl}`, { ...(filters || {}) })
+        } catch(e) {
+            console.log('Currency search failed')
+            throw e
+        }
     },
 
     Search: async function(url: string, filters: any) {
-        try{
-            const response = await fetch(`${url}/search`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
-            return await response.json()
-        } catch(error) {
-            return null
-        }
+        const response = await fetch(`${url}/search`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
+        return await response.json()
     },
 
     Get: async function(url: string) {
-        try{
-            const response = await fetch(`${url}`, { method: 'GET', headers: this.GetHeaders() })
-            return await response.json()
-        } catch(error) {
-            return null
-        }
+        const response = await fetch(`${url}`, { method: 'GET', headers: this.GetHeaders() })
+        return await response.json()
     },
 
     GetHeaders: function(): Headers {

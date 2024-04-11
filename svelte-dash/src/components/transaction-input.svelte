@@ -12,6 +12,8 @@
             currentInput =  ''
     }
 
+    export let readonly: boolean
+
     const dispatch = createEventDispatcher();
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
@@ -109,7 +111,6 @@
     const inputSubmit = () => {
         if(!hasError && !isDataMissing){
             dispatch('transactionSubmit', { transaction })
-            currentInput = ''
         }
     }
     const inputCancel = () => {
@@ -127,7 +128,8 @@
                 on:keyup={processInput} 
                 on:focus={inputFocus}
                 on:blur={inputBlur} 
-                bind:value={currentInput}/>
+                bind:value={currentInput}
+                readonly={readonly}/>
         <label for="transaction-input">
             <span class={accountError ? 'error-text': ''}>konto*</span>
             <span class={categoryError ? 'error-text': ''}>kategoria*</span>
@@ -146,7 +148,7 @@
     @import '../styles/app.scss';
 
     .transaction-input {  
-        display: flex; gap: 5px; flex-direction: row; justify-content: right;
+        display: flex; gap: 5px; flex-direction: row; justify-content: center;
         .input-group { display: flex; flex-direction: column; align-items: center;
                        flex-grow: 0; }
         .button-group { display: flex; gap: inherit; align-items: flex-start; 

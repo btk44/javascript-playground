@@ -42,12 +42,12 @@
     </tr>
     {#each transactions as transaction, index}
     <tr class={selectedRow === index ? 'selected' : ''} on:dblclick={() => { rowDoubleClick(transaction, index) }}>
-        <td class="aln-l w-20">{formatDate(transaction.date)}</td>
-        <td class="aln-l w-20">{accounts[transaction.accountId]?.name ?? ''}</td>
-        <td class="aln-l w-20">{categories[transaction.categoryId]?.name ?? ''}</td>
-        <td class="aln-l w-10">{formatAmount(transaction.amount)}</td>
-        <td class="aln-l w-10">{accountCurrencyMap[transaction.accountId] ?? ''}</td>
-        <td class="aln-l w-20">{transaction.comment}</td>
+        <td class="aln-l w-20pc">{formatDate(transaction.date)}</td>
+        <td class="aln-l w-20pc">{accounts[transaction.accountId]?.name ?? ''}</td>
+        <td class="aln-l w-20pc">{categories[transaction.categoryId]?.name ?? ''}</td>
+        <td class="aln-l w-10pc">{formatAmount(transaction.amount)}</td>
+        <td class="aln-l w-10pc">{accountCurrencyMap[transaction.accountId] ?? ''}</td>
+        <td class="aln-l w-20pc">{transaction.comment}</td>
     </tr>
     {/each}
 </table>

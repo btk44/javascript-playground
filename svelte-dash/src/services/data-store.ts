@@ -79,7 +79,7 @@ export const initDataStore = async (ownerId: number, forceReload?: boolean) => {
   }
   catch(error){
       globalStore.loading = false
-      alert('There was an error loading data!')
+      console.log('There was an error loading data to the store!')
       return false
   }
 

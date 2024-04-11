@@ -12,10 +12,13 @@
     let currentTransaction: Transaction = GetEmptyTransaction()
     let currentTransactionBackup: Transaction = GetEmptyTransaction()
     let dataLoaded = false
+    let saving = false
+
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     onMount(async () => { 
-        displayTransactions = await TransactionService.SearchTransactions({ownerId: 1, take: 100, offset: 0})
-        dataLoaded = true
+        try{ displayTransactions = await TransactionService.SearchTransactions({ownerId: 1, take: 100, offset: 0}) }
+        finally{ dataLoaded = true }
     })
 
     const transactionInputChange = (event: any) => {
@@ -28,22 +31,38 @@
             displayTransactions[displayTransactions.indexOf(transaction)] = transaction
     }
 
-    const transactionInputSubmit = (event: any) => { 
+    const transactionInputSubmit = async (event: any) => { 
         if(addInProgress){
-            TransactionService.SaveTransactions([currentTransaction]).then((args) => {
-                let x = 10
-            })
-            transactionInputChange(event)
-            addInProgress = false
-            transactionInputStart()
+            try {
+                saving = true
+                await sleep(2000)
+                await TransactionService.SaveTransactions([currentTransaction]) 
+                transactionInputChange(event)
+                addInProgress = false
+                transactionInputStart()
+            }
+            catch { 
+                transactionInputChange(event) 
+            } finally {
+                saving = false
+            }
         }
 
         if(editInProgress){
-            TransactionService.SaveTransactions([currentTransaction])
-            transactionInputChange(event)
-            editInProgress = false
-            transactionInputStart()
-            resetSelection()
+            try {
+                saving = true
+                await sleep(2000)
+                await TransactionService.SaveTransactions([currentTransaction])
+                transactionInputChange(event)
+                editInProgress = false
+                transactionInputStart()
+                resetSelection()
+            }
+            catch { 
+                transactionInputChange(event) 
+            } finally {
+                saving = false
+            }
         }
     }
 
@@ -99,7 +118,11 @@
                       bind:resetSelection></TransactionTable>
 </div>
 <div class="action-panel">
+    {#if saving}
+    <div class="mask"><div class="loader"></div></div>
+    {/if}
     <TransactionInput bind:initTransaction={initTransactionInput}
+                    readonly={saving}
                     on:transactionChange={transactionInputChange} 
                     on:transactionSubmit={transactionInputSubmit} 
                     on:transactionEditStart={transactionInputStart}
