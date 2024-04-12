@@ -148,7 +148,7 @@
     @import '../styles/app.scss';
 
     .transaction-input {  
-        display: flex; gap: 5px; flex-direction: row; justify-content: center;
+        display: flex; gap: 5px; flex-direction: row; justify-content: left;
         .input-group { display: flex; flex-direction: column; align-items: center;
                        flex-grow: 0; }
         .button-group { display: flex; gap: inherit; align-items: flex-start; 

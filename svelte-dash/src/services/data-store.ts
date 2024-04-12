@@ -35,6 +35,10 @@ const saveToLocalStorage = (key: string, value: any) => {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+const removeFromLocalStorage = (key: string) => {
+  localStorage.removeItem(key);
+}
+
 const saveGlobalStoreToLS = () => {
     saveToLocalStorage('accounts', globalStore.accounts)
     saveToLocalStorage('categories', globalStore.categories)
@@ -82,26 +86,12 @@ export const initDataStore = async (ownerId: number, forceReload?: boolean) => {
       console.log('There was an error loading data to the store!')
       return false
   }
-
-  // return Promise
-  //   .all([accountsCall, categoryCall, currencyCall])
-  //   .then(([accountsResponse, categoriesResponse, currencyResponse]) => {
-  //     globalStore.accounts = Object.assign({}, ...accountsResponse.map((x: Account) => ({[x.id]: x})))
-  //     globalStore.categories = Object.assign({}, ...categoriesResponse.map((x: Category) => ({[x.id]: x})))
-  //     globalStore.currencies = Object.assign({}, ...currencyResponse.map((x: Currency) => ({[x.id]: x})))
-  //     globalStore.loading = false
-  //     globalStore.lastInit = new Date()
-  //     saveGlobalStoreToLS()
-
-  //     return true
-  //   })
-  //   .catch(() => {
-  //     globalStore.loading = false
-  //     alert('There was an error loading data!')
-  //     return false
-  //   })
 }
 
 export const getStoreAccounts = () => { return structuredClone(globalStore.accounts) }
 export const getStoreCategories = () => { return structuredClone(globalStore.categories) }
 export const getStoreCurrencies = () => { return structuredClone(globalStore.currencies) }
+
+export const savePageProperties = (pageName: string, properties: any) => { saveToLocalStorage(pageName, properties) }
+export const readPageProperties = (pageName: string) => { return loadFromLocalStorage(pageName) }
+export const resetPageProperties = (pageName: string) => { removeFromLocalStorage(pageName) }

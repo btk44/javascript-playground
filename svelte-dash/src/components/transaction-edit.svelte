@@ -36,7 +36,7 @@
             try {
                 saving = true
                 await sleep(2000)
-                await TransactionService.SaveTransactions([currentTransaction]) 
+                event.detail.transaction.id = (await TransactionService.SaveTransactions([currentTransaction]))[0].id
                 transactionInputChange(event)
                 addInProgress = false
                 transactionInputStart()
