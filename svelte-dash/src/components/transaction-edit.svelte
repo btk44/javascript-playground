@@ -13,13 +13,23 @@
     let currentTransactionBackup: Transaction = GetEmptyTransaction()
     let dataLoaded = false
     let saving = false
+    let page = 0
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
     onMount(async () => { 
-        try{ displayTransactions = await TransactionService.SearchTransactions({ownerId: 1, take: 100, offset: 0}) }
-        finally{ dataLoaded = true }
+        loadTransactionPage(0)
     })
+
+    const loadTransactionPage = async (pageChange: number) => {
+        if(page + pageChange < 0) return
+        page = page + pageChange
+        
+        dataLoaded = false
+        await sleep(2000)
+        try{ displayTransactions = await TransactionService.SearchTransactions({ownerId: 1, take: 100, offset: page*100}) }
+        finally{ dataLoaded = true }
+    }
 
     const transactionInputChange = (event: any) => {
         const transaction = event.detail.transaction
@@ -111,27 +121,40 @@
     let initTransactionInput: any
     let resetSelection: any
 </script>
-{#if dataLoaded}
-<div id="data" class="data">
-    <TransactionTable transactions={displayTransactions}
-                      on:transactionDoubleClick={transactionTableRowDbClick}
-                      bind:resetSelection></TransactionTable>
-</div>
-<div class="action-panel">
-    {#if saving}
+
+<div class="transaction-edit">
+    {#if !dataLoaded}
     <div class="mask"><div class="loader"></div></div>
     {/if}
-    <TransactionInput bind:initTransaction={initTransactionInput}
-                    readonly={saving}
-                    on:transactionChange={transactionInputChange} 
-                    on:transactionSubmit={transactionInputSubmit} 
-                    on:transactionEditStart={transactionInputStart}
-                    on:transactionCancel={transactionInputCancel}></TransactionInput>
+    <div id="data" class="data">
+        <TransactionTable transactions={displayTransactions}
+                        on:transactionDoubleClick={transactionTableRowDbClick}
+                        bind:resetSelection></TransactionTable>
+    </div>
+    <div class="action-panel">
+        {#if saving}
+        <div class="mask"><div class="loader"></div></div>
+        {/if}
+        <div>
+            <TransactionInput bind:initTransaction={initTransactionInput}
+                        readonly={saving}
+                        on:transactionChange={transactionInputChange} 
+                        on:transactionSubmit={transactionInputSubmit} 
+                        on:transactionEditStart={transactionInputStart}
+                        on:transactionCancel={transactionInputCancel}></TransactionInput>
+        </div>
+        <div>
+            <button class="button-outlined" on:click={() => {loadTransactionPage(-1)}}>&#x276E;</button>
+            <button class="button-outlined" on:click={() => {loadTransactionPage(1)}}>&#x276F;</button>
+        </div>
+    </div>
 </div>
-{/if}
+
 <style lang="scss">
     @import '../styles/app.scss';
 
+    .transaction-edit { position: relative;  }
     .data{ overflow-y: auto; }
-    .action-panel{ text-align: center; position: relative; border-top: 1px solid $primary-color-light; padding: 10px;} 
+    .action-panel{ display: flex; gap: 5px; flex-direction: row; justify-content: space-between;
+        position: relative; border-top: 1px solid $primary-color-light; padding: 10px;} 
 </style>
