@@ -4,8 +4,10 @@
 	import { createEventDispatcher } from 'svelte';
 
     export let transactions: Transaction[]
+    export let rowsVisible: number
     export const resetSelection = () => { selectedRow = -1 }
     let selectedRow = -1
+    $: emptyRowsCount = rowsVisible - transactions.length > 0 ? rowsVisible - transactions.length : 0
 
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const dispatch = createEventDispatcher()
@@ -48,6 +50,16 @@
         <td class="aln-l w-10pc">{formatAmount(transaction.amount)}</td>
         <td class="aln-l w-10pc">{accountCurrencyMap[transaction.accountId] ?? ''}</td>
         <td class="aln-l w-20pc">{transaction.comment}</td>
+    </tr>
+    {/each}
+    {#each {length: emptyRowsCount} as _, index }
+    <tr>
+        <td class="aln-l w-20pc"></td>
+        <td class="aln-l w-20pc"></td>
+        <td class="aln-l w-20pc"></td>
+        <td class="aln-l w-10pc"></td>
+        <td class="aln-l w-10pc"></td>
+        <td class="aln-l w-20pc"></td>
     </tr>
     {/each}
 </table>

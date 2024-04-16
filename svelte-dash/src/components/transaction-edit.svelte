@@ -14,6 +14,8 @@
     let dataLoaded = false
     let saving = false
     let page = 0
+    let pageCount = 0
+    const pageSize = 10
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -22,12 +24,24 @@
     })
 
     const loadTransactionPage = async (pageChange: number) => {
-        if(page + pageChange < 0) return
-        page = page + pageChange
+        const nextPage = page + pageChange
+        if(nextPage < 0) return
         
         dataLoaded = false
-        await sleep(2000)
-        try{ displayTransactions = await TransactionService.SearchTransactions({ownerId: 1, take: 100, offset: page*100}) }
+        editInProgress = false
+        currentTransaction = currentTransactionBackup = null
+        cancelAddTransaction()
+        await sleep(500)
+        try{
+            const transactionSearchCall = TransactionService.SearchTransactions({ownerId: 1, take: pageSize, offset: nextPage*pageSize})
+            const transactionCountCall = TransactionService.SearchTransactionsCount({ownerId: 1})
+            const [transactionResult, countResult] = await Promise.all([transactionSearchCall, transactionCountCall])
+            if(transactionResult.length > 0){
+                page = nextPage
+                displayTransactions = transactionResult.length > 0 ? transactionResult : displayTransactions
+                pageCount = Math.ceil(countResult / pageSize)
+            }
+        }
         finally{ dataLoaded = true }
     }
 
@@ -45,7 +59,7 @@
         if(addInProgress){
             try {
                 saving = true
-                await sleep(2000)
+                await sleep(500)
                 event.detail.transaction.id = (await TransactionService.SaveTransactions([currentTransaction]))[0].id
                 transactionInputChange(event)
                 addInProgress = false
@@ -104,11 +118,11 @@
     }
 
     const transactionTableRowDbClick = (event: any) => {
+        editInProgress = true
         cancelAddTransaction()
         currentTransaction = event.detail.transaction
         currentTransactionBackup = { ...event.detail.transaction }
         initTransactionInput(currentTransaction)
-        editInProgress = true
     } 
 
     const cancelAddTransaction = () => {
@@ -128,6 +142,7 @@
     {/if}
     <div id="data" class="data">
         <TransactionTable transactions={displayTransactions}
+                        rowsVisible={pageSize}
                         on:transactionDoubleClick={transactionTableRowDbClick}
                         bind:resetSelection></TransactionTable>
     </div>
@@ -145,6 +160,7 @@
         </div>
         <div>
             <button class="button-outlined" on:click={() => {loadTransactionPage(-1)}}>&#x276E;</button>
+            <span>{`${page + 1} / ${pageCount}`}</span>
             <button class="button-outlined" on:click={() => {loadTransactionPage(1)}}>&#x276F;</button>
         </div>
     </div>
@@ -154,7 +170,7 @@
     @import '../styles/app.scss';
 
     .transaction-edit { position: relative;  }
-    .data{ overflow-y: auto; }
+    .data{ overflow-y: auto; height: 11.7*$control-min-height;}
     .action-panel{ display: flex; gap: 5px; flex-direction: row; justify-content: space-between;
         position: relative; border-top: 1px solid $primary-color-light; padding: 10px;} 
 </style>

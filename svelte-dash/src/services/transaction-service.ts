@@ -22,6 +22,15 @@ export const TransactionService = {
         }
     },
 
+    SearchTransactionsCount: async function(filters?: TransactionSearchFilters) {    
+        try{
+            return await this.SearchCount(`${this.apiUrl}/${this.transactionUrl}`, { ...(filters || {}) })
+        } catch(e) {
+            console.log('Transaction search count failed')
+            throw e
+        }
+    },
+
     SaveTransactions: async function(transactions: Array<Transaction>) {    
         try{
             const processInput = { transactions: transactions }
@@ -63,6 +72,11 @@ export const TransactionService = {
 
     Search: async function(url: string, filters: any) {
         const response = await fetch(`${url}/search`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
+        return await response.json()
+    },
+
+    SearchCount: async function(url: string, filters: any) {
+        const response = await fetch(`${url}/search-count`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
         return await response.json()
     },
 
