@@ -3,6 +3,8 @@
     import { getStoreAccounts, getStoreCategories } from '../services/data-store'
 	import { createEventDispatcher } from 'svelte';
 
+    const inputId = 'transaction-input'
+
     export const initTransaction = (initTransaction: Transaction) => {  
         transaction = initTransaction
         if(transaction.id > 0){
@@ -13,6 +15,9 @@
     }
 
     export let readonly: boolean
+    export let disabled: boolean
+    export const focus = () => { document.getElementById(inputId).focus() }
+    export const blur = () => { document.getElementById(inputId).blur() }
 
     const dispatch = createEventDispatcher();
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
@@ -81,10 +86,7 @@
 
         let currentInput = event.target.value
 
-        if (event.key === "Escape") {
-            inputCancel()
-            event.currentTarget.blur()
-        }
+        if (event.key === "Escape") inputCancel()
 
         if(currentInput && currentInput.trim() !== ''){
             const inputValues = currentInput.match(/\s{0,}[^\s]{1,}/g)
@@ -124,13 +126,14 @@
 </script>
 <div class="transaction-input">
     <div class="input-group">
-        <input type="text" name="transaction-input" id="transaction-input" placeholder="wprowadź transakcję" 
+        <input type="text" name={inputId} id={inputId} placeholder="wprowadź transakcję" 
                 on:keyup={processInput} 
                 on:focus={inputFocus}
                 on:blur={inputBlur} 
                 bind:value={currentInput}
-                readonly={readonly}/>
-        <label for="transaction-input">
+                readonly={readonly}
+                disabled={disabled}/>
+        <label for={inputId}>
             <span class={accountError ? 'error-text': ''}>konto*</span>
             <span class={categoryError ? 'error-text': ''}>kategoria*</span>
             <span class={amountError ? 'error-text': ''}>kwota*</span>
@@ -138,8 +141,8 @@
         </label>
     </div>
     <div class="button-group">
-        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isDataMissing}>&#x2713;</button>
-        <button class="button-outlined" on:click={inputCancel}>&#x2715;</button>
+        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isDataMissing || disabled}>&#x2713;</button>
+        <button class="button-outlined" on:click={inputCancel} disabled={disabled}>&#x2715;</button>
     </div>
 </div>
 

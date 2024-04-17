@@ -15,7 +15,7 @@
     let saving = false
     let page = 0
     let pageCount = 0
-    const pageSize = 10
+    const pageSize = 15
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -27,10 +27,8 @@
         const nextPage = page + pageChange
         if(nextPage < 0) return
         
+        transactionInputCancel()
         dataLoaded = false
-        editInProgress = false
-        currentTransaction = currentTransactionBackup = null
-        cancelAddTransaction()
         await sleep(500)
         try{
             const transactionSearchCall = TransactionService.SearchTransactions({ownerId: 1, take: pageSize, offset: nextPage*pageSize})
@@ -57,8 +55,8 @@
 
     const transactionInputSubmit = async (event: any) => { 
         if(addInProgress){
+            saving = true
             try {
-                saving = true
                 await sleep(500)
                 event.detail.transaction.id = (await TransactionService.SaveTransactions([currentTransaction]))[0].id
                 transactionInputChange(event)
@@ -73,14 +71,15 @@
         }
 
         if(editInProgress){
+            saving = true
             try {
-                saving = true
                 await sleep(2000)
                 await TransactionService.SaveTransactions([currentTransaction])
                 transactionInputChange(event)
                 editInProgress = false
-                transactionInputStart()
+                initTransactionInput(GetEmptyTransaction())
                 resetSelection()
+                blurInput()
             }
             catch { 
                 transactionInputChange(event) 
@@ -115,6 +114,7 @@
         }
 
         cancelAddTransaction()
+        blurInput()
     }
 
     const transactionTableRowDbClick = (event: any) => {
@@ -134,6 +134,8 @@
 
     let initTransactionInput: any
     let resetSelection: any
+    let focusInput: any
+    let blurInput: any
 </script>
 
 <div class="transaction-edit">
@@ -152,7 +154,10 @@
         {/if}
         <div>
             <TransactionInput bind:initTransaction={initTransactionInput}
+                              bind:focus={focusInput}
+                              bind:blur={blurInput}
                         readonly={saving}
+                        disabled={page !== pageCount -1 && !editInProgress}
                         on:transactionChange={transactionInputChange} 
                         on:transactionSubmit={transactionInputSubmit} 
                         on:transactionEditStart={transactionInputStart}
@@ -170,7 +175,7 @@
     @import '../styles/app.scss';
 
     .transaction-edit { position: relative;  }
-    .data{ overflow-y: auto; height: 11.7*$control-min-height;}
+    .data{ overflow-y: auto; height: 15*1.13*$control-min-height;} // pageSize * 1.13 * control height
     .action-panel{ display: flex; gap: 5px; flex-direction: row; justify-content: space-between;
         position: relative; border-top: 1px solid $primary-color-light; padding: 10px;} 
 </style>

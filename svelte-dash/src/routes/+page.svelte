@@ -57,6 +57,9 @@
     <Card>
         <TransactionEdit></TransactionEdit>
     </Card>
+    <Card>
+        <AccountTable></AccountTable>
+    </Card>
     {/if}
 </div>
 
@@ -79,9 +82,14 @@
     $side-size: 200px;
 
     .test { 
+            display: grid; 
+            grid-template-columns: 3fr 1fr;
+            gap: 15px;
             margin: 3px;            
             width: calc(100vw - 10px);
-            height: calc(100vh - 10px) }
+            padding: 15px;
+            height: calc(100vh - 10px) 
+        }
 
     .main-page {
         // * {
