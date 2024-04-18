@@ -16,26 +16,29 @@
     }
 </script>
 
-<table>
-    <tr>
-        {#each headers as header}
-        <th class="aln-l">{header}</th>
+<div class="data">
+    <table>
+        <tr>
+            {#each headers as header}
+            <th class="aln-l">{header}</th>
+            {/each}
+        </tr>
+        {#each Object.entries(accounts) as [accountId, account]}
+        {#if account.active}
+        <tr>
+            <td class="aln-l w-10pc">{accountId}</td>
+            <td class="aln-l w-40pc">{account.name}</td>
+            <td class="aln-l w-30pc">{formatAmount(account.amount)}</td>
+            <td class="aln-l w-20pc">{accountCurrencyMap[accountId] ?? ''}</td>
+        </tr>
+        {/if}
         {/each}
-    </tr>
-    {#each Object.entries(accounts) as [accountId, account]}
-    {#if account.active}
-    <tr>
-        <td class="aln-l w-10pc">{accountId}</td>
-        <td class="aln-l w-40pc">{account.name}</td>
-        <td class="aln-l w-30pc">{formatAmount(account.amount)}</td>
-        <td class="aln-l w-20pc">{accountCurrencyMap[accountId] ?? ''}</td>
-    </tr>
-    {/if}
-    {/each}
-</table>
+    </table>
+</div>
 
 <style lang="scss">
     @import '../styles/app.scss';
     
+    .data{ overflow-y: auto; height: 100%;} 
     .inactive { background-color: $accent-color-light;}
 </style>

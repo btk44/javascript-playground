@@ -54,12 +54,16 @@
 </div> -->
 <div class="test">
     {#if dataLoaded}
-    <Card>
-        <TransactionEdit></TransactionEdit>
-    </Card>
-    <Card>
-        <AccountTable></AccountTable>
-    </Card>
+    <div class="transactions">
+        <Card>
+            <TransactionEdit></TransactionEdit>
+        </Card>
+    </div>
+    <div class="accounts">
+        <Card>
+            <AccountTable></AccountTable>
+        </Card>
+    </div>
     {/if}
 </div>
 
@@ -74,7 +78,8 @@
                  font-family: inherit; font-optical-sizing: inherit; font-weight: inherit; font-style: inherit; }
 
     //set global styles
-    :global(body) { margin: 0; display: flex; place-items: center; min-width: 320px; min-height: 100vh; background-color: $background-color; }
+    :global(html) { margin: 0; height: 100vh; background-color: $background-color; }
+    :global(body) { margin: 0; display: flex; place-items: center; min-width: 320px; height: 100vh; background-color: $background-color; }
     
 
     // main page styles
@@ -84,11 +89,18 @@
     .test { 
             display: grid; 
             grid-template-columns: 3fr 1fr;
-            gap: 15px;
-            margin: 3px;            
-            width: calc(100vw - 10px);
-            padding: 15px;
-            height: calc(100vh - 10px) 
+            grid-template-rows: calc(50vh - 0px) calc(50vh - 0px) ;
+            grid-template-areas: 
+            "transactions accounts"
+            "transactions categories";
+            position: relative;
+            margin: 0;
+            padding: 0;
+            width: calc(100vw - 0px);
+            height: calc(100vh - 0px);
+
+            .transactions{ grid-area: transactions; }
+            .accounts { grid-area: accounts }
         }
 
     .main-page {

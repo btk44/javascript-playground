@@ -15,7 +15,7 @@
     let saving = false
     let page = 0
     let pageCount = 0
-    const pageSize = 15
+    const pageSize = 30
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -174,8 +174,8 @@
 <style lang="scss">
     @import '../styles/app.scss';
 
-    .transaction-edit { position: relative;  }
-    .data{ overflow-y: auto; height: 15*1.13*$control-min-height;} // pageSize * 1.13 * control height
+    .transaction-edit { position: relative; height: 100%;}
+    .data{ overflow-y: auto; height: 90%;} 
     .action-panel{ display: flex; gap: 5px; flex-direction: row; justify-content: space-between;
-        position: relative; border-top: 1px solid $primary-color-light; padding: 10px;} 
+        position: relative; border-top: 1px solid $primary-color-light; padding: 10px; height: 10%;} 
 </style>
