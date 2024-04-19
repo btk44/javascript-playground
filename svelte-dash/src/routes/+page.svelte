@@ -4,6 +4,7 @@
     import Card from '../components/card.svelte';
 	import TransactionEdit from '../components/transaction-edit.svelte';
     import { initDataStore } from '../services/data-store'
+	import CategoryTable from '../components/category-table.svelte';
 
     let expandSidebar = false;
     const sidebarButtons = [ 
@@ -64,6 +65,11 @@
             <AccountTable></AccountTable>
         </Card>
     </div>
+    <div class="categories">
+        <Card>
+            <CategoryTable></CategoryTable>
+        </Card>
+    </div>
     {/if}
 </div>
 
@@ -88,11 +94,12 @@
 
     .test { 
             display: grid; 
-            grid-template-columns: 3fr 1fr;
-            grid-template-rows: calc(50vh - 0px) calc(50vh - 0px) ;
+            grid-template-columns: 2.5fr 1fr;
+            grid-template-rows: calc(50vh - 5px) calc(50vh - 5px) ;
             grid-template-areas: 
             "transactions accounts"
             "transactions categories";
+            gap: 10px;
             position: relative;
             margin: 0;
             padding: 0;
@@ -101,6 +108,7 @@
 
             .transactions{ grid-area: transactions; }
             .accounts { grid-area: accounts }
+            .categories { grid-area: categories }
         }
 
     .main-page {

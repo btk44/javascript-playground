@@ -15,7 +15,7 @@
     let saving = false
     let page = 0
     let pageCount = 0
-    const pageSize = 30
+    const pageSize = 25
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -24,20 +24,23 @@
     })
 
     const loadTransactionPage = async (pageChange: number) => {
-        const nextPage = page + pageChange
+        let nextPage = page + pageChange
         if(nextPage < 0) return
         
         transactionInputCancel()
         dataLoaded = false
-        await sleep(500)
+        await sleep(500)       
         try{
-            const transactionSearchCall = TransactionService.SearchTransactions({ownerId: 1, take: pageSize, offset: nextPage*pageSize})
-            const transactionCountCall = TransactionService.SearchTransactionsCount({ownerId: 1})
-            const [transactionResult, countResult] = await Promise.all([transactionSearchCall, transactionCountCall])
-            if(transactionResult.length > 0){
+            const transactionCountResult = await TransactionService.SearchTransactionsCount({ownerId: 1})
+            pageCount = Math.max(Math.ceil(transactionCountResult / pageSize), 1)
+
+            if(pageChange === 0) nextPage = pageCount -1 // initial load -> go to last page
+
+            const transactionSearchResult = await TransactionService.SearchTransactions({ownerId: 1, take: pageSize, offset: nextPage*pageSize})
+
+            if(transactionSearchResult.length > 0){
                 page = nextPage
-                displayTransactions = transactionResult.length > 0 ? transactionResult : displayTransactions
-                pageCount = Math.ceil(countResult / pageSize)
+                displayTransactions = transactionSearchResult
             }
         }
         finally{ dataLoaded = true }
@@ -99,7 +102,7 @@
             initTransactionInput(currentTransaction)
             const objDiv = document.getElementById('data')
             if(objDiv)
-                setTimeout(() => objDiv.scrollTop = objDiv.scrollHeight, 40)
+                setTimeout(() => { if(displayTransactions.length > 10) objDiv.scrollTop = objDiv.scrollHeight }, 40) // this is a hack :(
             addInProgress = true
         }
     }
