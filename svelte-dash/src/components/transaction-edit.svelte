@@ -43,6 +43,7 @@
                 displayTransactions = transactionSearchResult
             }
         }
+        catch{ alert('server error') }
         finally{ dataLoaded = true }
     }
 
@@ -68,6 +69,7 @@
             }
             catch { 
                 transactionInputChange(event) 
+                alert('server error')
             } finally {
                 saving = false
             }
@@ -86,6 +88,7 @@
             }
             catch { 
                 transactionInputChange(event) 
+                alert('server error')
             } finally {
                 saving = false
             }

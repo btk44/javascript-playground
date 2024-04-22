@@ -93,16 +93,17 @@
     $side-size: 200px;
 
     .test { 
+            background-color: lightgray;
             display: grid; 
             grid-template-columns: 2.5fr 1fr;
-            grid-template-rows: calc(50vh - 5px) calc(50vh - 5px) ;
+            grid-template-rows: calc(50vh - 8px - 16px) calc(50vh - 8px - 16px) ;
             grid-template-areas: 
             "transactions accounts"
             "transactions categories";
-            gap: 10px;
+            gap: 16px;
             position: relative;
             margin: 0;
-            padding: 0;
+            padding: 16px;
             width: calc(100vw - 0px);
             height: calc(100vh - 0px);
 

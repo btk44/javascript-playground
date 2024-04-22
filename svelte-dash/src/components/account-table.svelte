@@ -2,7 +2,7 @@
 	import { getStoreAccounts, getStoreCurrencies } from "../services/data-store";
   
 
-    const headers = ['id', 'nazwa', 'kwota', '-'] 
+    const headers = ['id', 'nazwa', 'kwota', '-', ''] 
     const accounts = getStoreAccounts()
     const accountCurrencyMap = (() => {
         let accountToCurrencyMap = {}
@@ -17,6 +17,7 @@
 </script>
 
 <div class="data">
+    <!-- <div class="mask"><div class="loader"></div></div> -->
     <table>
         <tr>
             {#each headers as header}
@@ -27,9 +28,10 @@
         {#if account.active}
         <tr>
             <td class="aln-l w-10pc">{accountId}</td>
-            <td class="aln-l w-40pc">{account.name}</td>
+            <td class="aln-l w-35pc">{account.name}</td>
             <td class="aln-l w-30pc">{formatAmount(account.amount)}</td>
-            <td class="aln-l w-20pc">{accountCurrencyMap[accountId] ?? ''}</td>
+            <td class="aln-l w-10pc">{accountCurrencyMap[accountId] ?? ''}</td>
+            <td class="aln-c w-15pc"><button class="button-text-only">&#10226;</button></td>
         </tr>
         {/if}
         {/each}
@@ -41,4 +43,5 @@
     
     .data{ overflow-y: auto; height: 100%;} 
     .inactive { background-color: $accent-color-light;}
+    tr { position: relative; }
 </style>

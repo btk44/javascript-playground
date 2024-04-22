@@ -6,6 +6,7 @@
     @import '../styles/app.scss';
 
     .card {
+        background-color: $background-color;
         padding: 5px;
         box-shadow: $control-box-shadow;
         display: flex;

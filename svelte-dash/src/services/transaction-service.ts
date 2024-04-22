@@ -14,7 +14,7 @@ export const TransactionService = {
 
     SearchTransactions: async function(filters?: TransactionSearchFilters) {    
         try{
-            const response = await this.Search(`${this.apiUrl}/${this.transactionUrl}`, { ...(filters || {}) })
+            const response = await this.Post(`${this.apiUrl}/${this.transactionUrl}/search`, { ...(filters || {}) })
             return response.map((t: Transaction) => { return { ...t, date: new Date(t.date)} })
         } catch(e) {
             console.log('Transaction search failed')
@@ -24,9 +24,18 @@ export const TransactionService = {
 
     SearchTransactionsCount: async function(filters?: TransactionSearchFilters) {    
         try{
-            return await this.SearchCount(`${this.apiUrl}/${this.transactionUrl}`, { ...(filters || {}) })
+            return await this.Post(`${this.apiUrl}/${this.transactionUrl}/search-count`, { ...(filters || {}) })
         } catch(e) {
             console.log('Transaction search count failed')
+            throw e
+        }
+    },
+
+    SearchTransactionsSum: async function(filters?: TransactionSearchFilters) {    
+        try{
+            return await this.Post(`${this.apiUrl}/${this.transactionUrl}/search-sum`, { ...(filters || {}) })
+        } catch(e) {
+            console.log('Transaction search sum failed')
             throw e
         }
     },
@@ -45,7 +54,7 @@ export const TransactionService = {
 
     SearchAccounts: async function(filters?: AccountSearchFilters) {    
         try{
-            return await this.Search(`${this.apiUrl}/${this.accountUrl}`, { ...(filters || {}) })
+            return await this.Post(`${this.apiUrl}/${this.accountUrl}/search`, { ...(filters || {}) })
         } catch(e) {
             console.log('Account search failed')
             throw e
@@ -54,7 +63,7 @@ export const TransactionService = {
 
     SearchCategories: async function(filters?: CategorySearchFilters) {    
         try{
-            return await this.Search(`${this.apiUrl}/${this.categoryUrl}`, { ...(filters || {}) })
+            return await this.Post(`${this.apiUrl}/${this.categoryUrl}/search`, { ...(filters || {}) })
         } catch(e) {
             console.log('Category search failed')
             throw e
@@ -63,20 +72,15 @@ export const TransactionService = {
 
     SearchCurrencies: async function(filters?: CurrencySearchFilters) {    
         try{
-            return await this.Search(`${this.apiUrl}/${this.currencyUrl}`, { ...(filters || {}) })
+            return await this.Post(`${this.apiUrl}/${this.currencyUrl}/search`, { ...(filters || {}) })
         } catch(e) {
             console.log('Currency search failed')
             throw e
         }
     },
 
-    Search: async function(url: string, filters: any) {
-        const response = await fetch(`${url}/search`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
-        return await response.json()
-    },
-
-    SearchCount: async function(url: string, filters: any) {
-        const response = await fetch(`${url}/search-count`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
+    Post: async function(url: string, filters: any) {
+        const response = await fetch(`${url}`, { method: 'POST', body: JSON.stringify(filters), headers: this.GetHeaders() })
         return await response.json()
     },
 
