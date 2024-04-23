@@ -126,7 +126,7 @@
 </script>
 <div class="transaction-input">
     <div class="input-group">
-        <input type="text" name={inputId} id={inputId} placeholder="wprowadź transakcję" 
+        <input type="text" name={inputId} id={inputId} placeholder="0 0 -0.00 xxxx" 
                 on:keyup={processInput} 
                 on:focus={inputFocus}
                 on:blur={inputBlur} 

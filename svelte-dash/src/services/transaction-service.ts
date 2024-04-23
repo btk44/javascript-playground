@@ -1,3 +1,4 @@
+import { type AccountAmountCalculateParameters } from '../models/account-amount-calculation-parameters'
 import { type AccountSearchFilters } from '../models/account-search-filters'
 import { type CategorySearchFilters } from '../models/cartegory-search-filters'
 import { type CurrencySearchFilters } from '../models/currency-search-filters'
@@ -57,6 +58,15 @@ export const TransactionService = {
             return await this.Post(`${this.apiUrl}/${this.accountUrl}/search`, { ...(filters || {}) })
         } catch(e) {
             console.log('Account search failed')
+            throw e
+        }
+    },
+
+    CalculateAccountsAmount: async function(filters?: AccountAmountCalculateParameters) {    
+        try{
+            return await this.Post(`${this.apiUrl}/${this.accountUrl}/calculate-amount`, { ...(filters || {}) })
+        } catch(e) {
+            console.log('Account amount calculation failed')
             throw e
         }
     },

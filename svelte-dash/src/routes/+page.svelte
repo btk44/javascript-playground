@@ -85,8 +85,7 @@
 
     //set global styles
     :global(html) { margin: 0; height: 100vh; background-color: $background-color; }
-    :global(body) { margin: 0; display: flex; place-items: center; min-width: 320px; height: 100vh; background-color: $background-color; }
-    
+    :global(body) { margin: 0; display: flex; place-items: center; min-width: 320px; height: 100vh; background-color: $background-color; } 
 
     // main page styles
     $header-size: 60px;

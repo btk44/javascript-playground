@@ -72,7 +72,7 @@ export const initDataStore = async (ownerId: number, forceReload?: boolean) => {
   const currencyCall = TransactionService.SearchCurrencies()
 
   try{
-    let [accountsResponse, categoriesResponse, currencyResponse] = await Promise.all([accountsCall, categoryCall, currencyCall])
+    const [accountsResponse, categoriesResponse, currencyResponse] = await Promise.all([accountsCall, categoryCall, currencyCall])
     globalStore.accounts = Object.assign({}, ...accountsResponse.map((x: Account) => ({[x.id]: x})))
     globalStore.categories = Object.assign({}, ...categoriesResponse.map((x: Category) => ({[x.id]: x})))
     globalStore.currencies = Object.assign({}, ...currencyResponse.map((x: Currency) => ({[x.id]: x})))
