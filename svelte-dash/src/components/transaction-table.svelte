@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Transaction }  from '../models/transaction'
-    import { getStoreAccounts, getStoreCategories, getStoreCurrencies } from '../services/data-store'
 	import { createEventDispatcher } from 'svelte';
+	import { accountStoreRO, categoryStoreRO, accountCurrencyMap } from '../services/store';
 
     export let transactions: Transaction[]
     export let rowsVisible: number
@@ -11,14 +11,9 @@
 
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const dispatch = createEventDispatcher()
-    const accounts = getStoreAccounts()
-    const categories = getStoreCategories()
-    const accountCurrencyMap = (() => {
-        let accountToCurrencyMap = {}
-        let currencyDictionary = getStoreCurrencies()
-        Object.keys(accounts).forEach(accKey => { accountToCurrencyMap[accKey] = currencyDictionary[accounts[accKey].currencyId].code })
-        return accountToCurrencyMap
-    })()
+    const accounts = $accountStoreRO // subscribe instead
+    const categories = $categoryStoreRO // subscribe instead
+    const accountCurrency = accountCurrencyMap()
 
     const formatDate = (date: Date): string => { 
         const addLeadingZero = (number: number): string =>  number < 10 ? `0${number}` : number.toString()
@@ -48,7 +43,7 @@
         <td class="aln-l w-20pc">{accounts[transaction.accountId]?.name ?? ''}</td>
         <td class="aln-l w-20pc">{categories[transaction.categoryId]?.name ?? ''}</td>
         <td class="aln-l w-10pc">{formatAmount(transaction.amount)}</td>
-        <td class="aln-l w-10pc">{accountCurrencyMap[transaction.accountId] ?? ''}</td>
+        <td class="aln-l w-10pc">{accountCurrency[transaction.accountId] ?? ''}</td>
         <td class="aln-l w-20pc">{transaction.comment}</td>
     </tr>
     {/each}

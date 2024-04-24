@@ -1,3 +1,5 @@
+// to do : this file can be removed
+
 import type { Account } from "../models/account"
 import type { Category } from "../models/category"
 import type { Currency } from "../models/currency"
@@ -14,8 +16,8 @@ export const accounts: Account[] = [
 ]
 
 export const currencies: Currency[] = [
-    { id: 1, description: "Polish zloty", code: "PLN" },
-    { id: 2, description: "Euro", code: "EUR" }
+    { id: 1, description: "Polish zloty", code: "PLN", active: true },
+    { id: 2, description: "Euro", code: "EUR", active: true }
 ]
 
 export const categories: Category[] = [

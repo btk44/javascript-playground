@@ -3,8 +3,8 @@
     import AccountTable from '../components/account-table.svelte';
     import Card from '../components/card.svelte';
 	import TransactionEdit from '../components/transaction-edit.svelte';
-    import { initDataStore } from '../services/data-store'
 	import CategoryTable from '../components/category-table.svelte';
+	import { initDataStore } from '../services/store';
 
     let expandSidebar = false;
     const sidebarButtons = [ 
