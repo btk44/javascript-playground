@@ -5,7 +5,7 @@
 	import { TransactionService } from '../services/transaction-service';
 	import TransactionInput from './transaction-input.svelte'
 	import TransactionTable from './transaction-table.svelte'
-	import { reloadAccounts } from '../services/store';
+	import { reloadAccount } from '../services/store';
 
     let displayTransactions: Array<Transaction> = []
     let addInProgress = false
@@ -64,6 +64,7 @@
             try {
                 await sleep(500)
                 event.detail.transaction.id = (await TransactionService.SaveTransactions([currentTransaction]))[0].id
+                await reloadAccount(1, currentTransaction.accountId)
                 transactionInputChange(event)
                 addInProgress = false
                 transactionInputStart()
@@ -81,8 +82,7 @@
             try {
                 await sleep(2000)
                 await TransactionService.SaveTransactions([currentTransaction])
-                await TransactionService.CalculateAccountsAmount({ownerId: 1, accounts: [currentTransaction.accountId]}) // just test ! to do
-                await reloadAccounts(1) // just test ! to do     after saving trans run recalculate for only one account and then search and reassing this account to store and local storage
+                await reloadAccount(1, currentTransaction.accountId)
                 transactionInputChange(event)
                 editInProgress = false
                 initTransactionInput(GetEmptyTransaction())

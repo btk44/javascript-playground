@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Transaction }  from '../models/transaction'
 	import { createEventDispatcher } from 'svelte';
-	import { accountStoreRO, categoryStoreRO, accountCurrencyMap } from '../services/store';
+	import { accountStoreReadOnly, categoryStoreReadOnly, accountCurrencyMap } from '../services/store';
 
     export let transactions: Transaction[]
     export let rowsVisible: number
@@ -11,8 +11,8 @@
 
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const dispatch = createEventDispatcher()
-    const accounts = $accountStoreRO // subscribe instead
-    const categories = $categoryStoreRO // subscribe instead
+    const accounts = $accountStoreReadOnly 
+    const categories = $categoryStoreReadOnly
     const accountCurrency = accountCurrencyMap()
 
     const formatDate = (date: Date): string => { 

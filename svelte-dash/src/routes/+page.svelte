@@ -18,7 +18,7 @@
 
     onMount(async () => { 
         try{
-            await initDataStore(1)
+            await initDataStore(1,true)
             dataLoaded = true
         }
         catch(error){

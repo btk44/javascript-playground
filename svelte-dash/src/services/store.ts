@@ -36,14 +36,14 @@ const getLastInitTime = () => {
     return loadFromLocalStorage('last-init', (dateStr: string) => { return new Date(dateStr) }) 
 }
 
-const accountStore = writable<Array<Account>>(loadFromLocalStorage('accounts') ?? [])
-const categoryStore = writable<Array<Category>>(loadFromLocalStorage('categories') ?? [])
-const currencyStore = writable<Array<Currency>>(loadFromLocalStorage('currencies') ?? [])
+const accountStore = writable<Array<Account>>(loadFromLocalStorage('accounts') ?? {})
+const categoryStore = writable<Array<Category>>(loadFromLocalStorage('categories') ?? {})
+const currencyStore = writable<Array<Currency>>(loadFromLocalStorage('currencies') ?? {})
 const lastInitStore = writable<Date>(getLastInitTime() ?? new Date(2000, 1, 1))
 
-export const accountStoreRO = readonly(accountStore)
-export const categoryStoreRO = readonly(categoryStore)
-export const currencyStoreRO = readonly(currencyStore)
+export const accountStoreReadOnly = readonly(accountStore)
+export const categoryStoreReadOnly = readonly(categoryStore)
+export const currencyStoreReadOnly = readonly(currencyStore)
 
 accountStore.subscribe((v) => { saveToLocalStorage('accounts', v) })
 categoryStore.subscribe((v) => { saveToLocalStorage('categories', v) })
@@ -76,20 +76,24 @@ export const initDataStore = async (ownerId: number, forceReload?: boolean) => {
     }
 }
 
-export const reloadAccounts = async (ownerId: number) => { // make it use account selection
+export const reloadAccount = async (ownerId: number, accountId: number) => {
     try{
-        const accountsResponse = await TransactionService.SearchAccounts({ownerId: ownerId, active: true})
-        accountStore.set(Object.assign({}, ...accountsResponse.map((x: Account) => ({[x.id]: x}))))
+        await TransactionService.CalculateAccountsAmount({ownerId: ownerId, accounts: [accountId]})
+        const accountsResponse = await TransactionService.SearchAccounts({ownerId: ownerId, id: accountId})
+        await accountStore.update(data => { 
+            data[accountId] = accountsResponse[0]
+            return data
+        })
     } 
     catch(error){
-        console.log('There was an error loading data to the store!')
+        console.log('There was an error loading account data!')
     }
 }
 
 export const accountCurrencyMap = () => {
-    let accounts = get(accountStoreRO)
+    let accounts = get(accountStoreReadOnly)
     let accountToCurrencyMap = {}
-    let currencyDictionary = get(currencyStoreRO)
+    let currencyDictionary = get(currencyStoreReadOnly)
     Object.keys(accounts).forEach(accKey => { accountToCurrencyMap[accKey] = currencyDictionary[accounts[accKey].currencyId].code })
     return accountToCurrencyMap
 }

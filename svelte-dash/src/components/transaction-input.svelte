@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { GetEmptyTransaction, type Transaction }  from '../models/transaction'
 	import { createEventDispatcher } from 'svelte';
-    import { accountStoreRO, categoryStoreRO } from '../services/store';
+    import { accountStoreReadOnly, categoryStoreReadOnly } from '../services/store';
 
     const inputId = 'transaction-input'
 
@@ -22,8 +22,8 @@
     const dispatch = createEventDispatcher();
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
-    const accounts = $accountStoreRO // subscribe instead
-    const categories = $categoryStoreRO // subscribe instead
+    const accounts = $accountStoreReadOnly
+    const categories = $categoryStoreReadOnly
 
     let accountError = false
     let categoryError = false

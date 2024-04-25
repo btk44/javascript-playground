@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { accountStoreRO, accountCurrencyMap } from '../services/store'
+    import { accountStoreReadOnly, accountCurrencyMap } from '../services/store'
   
     const headers = ['id', 'nazwa', 'kwota', '-'] 
     const accountCurrency = accountCurrencyMap()
 
-    let accounts = $accountStoreRO
-    accountStoreRO.subscribe((data) => {accounts = data})
+    let accounts = $accountStoreReadOnly
+    accountStoreReadOnly.subscribe((data) => {accounts = data})
 
     const formatAmount = (amount: number): string => { 
         return amount < 0 ? amount.toString() : `${amount}` 

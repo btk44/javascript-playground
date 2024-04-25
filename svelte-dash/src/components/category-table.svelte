@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { type Category } from "../models/category";
-	import { categoryStoreRO } from "../services/store";
+	import { categoryStoreReadOnly } from "../services/store";
     
     const headers = ['id', 'nazwa'] 
     const categories = (() => { 
-        const originalCategories = $categoryStoreRO  // subscribe instead
+        const originalCategories = $categoryStoreReadOnly
         const originalCategoriesList = Object.entries(originalCategories).map(([k,v])=> v)
         let result: Array<Category> = []
         originalCategoriesList.filter(x => x.parentId === 0).forEach(x => {
