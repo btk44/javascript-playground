@@ -5,7 +5,7 @@
     const headers = ['id', 'nazwa'] 
     const categories = (() => { 
         const originalCategories = $categoryStoreReadOnly
-        const originalCategoriesList = Object.entries(originalCategories).map(([k,v])=> v)
+        const originalCategoriesList = Object.entries(originalCategories).map(([_,v])=> v)
         let result: Array<Category> = []
         originalCategoriesList.filter(x => x.parentId === 0).forEach(x => {
             result.push(x)
