@@ -4,10 +4,9 @@
 	import { accountStoreReadOnly, categoryStoreReadOnly, accountCurrencyMap } from '../services/store';
 
     export let transactions: Transaction[]
-    export let rowsVisible: number
+    export let pagerInfo: string
     export const resetSelection = () => { selectedRow = -1 }
     let selectedRow = -1
-    $: emptyRowsCount = rowsVisible - transactions.length > 0 ? rowsVisible - transactions.length : 0
 
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const dispatch = createEventDispatcher()
@@ -29,6 +28,10 @@
         dispatch('transactionDoubleClick', { transaction }) 
         selectedRow = index   
     }
+
+    const nextPageClick = () => { dispatch('nextPageClick') }
+    const prevPageClick = () => { dispatch('prevPageClick') }
+    const filtersClick = () => {  }
 </script>
 
 <table>
@@ -47,20 +50,18 @@
         <td class="aln-l w-20pc">{transaction.comment}</td>
     </tr>
     {/each}
-    {#each {length: emptyRowsCount} as _, index }
-    <tr>
-        <td class="aln-l w-20pc"></td>
-        <td class="aln-l w-20pc"></td>
-        <td class="aln-l w-20pc"></td>
-        <td class="aln-l w-10pc"></td>
-        <td class="aln-l w-10pc"></td>
-        <td class="aln-l w-20pc"></td>
-    </tr>
-    {/each}
 </table>
+<div class="actions">
+    <button class="button-outlined" on:click={() => { filtersClick() }}>&#x2637;</button>
+    <button class="button-outlined" on:click={() => { prevPageClick() }}>&#x276E;</button>
+    <span>{pagerInfo}</span>
+    <button class="button-outlined" on:click={() => { nextPageClick() }}>&#x276F;</button>
+</div>
+
 
 <style lang="scss">
     @import '../styles/app.scss';
     
+    .actions { margin: 10px; text-align: right; }
     .selected { background-color: $accent-color-light;}
 </style>

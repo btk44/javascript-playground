@@ -16,7 +16,7 @@
     let saving = false
     let page = 0
     let pageCount = 0
-    const pageSize = 25
+    const pageSize = 15
 
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -153,9 +153,12 @@
     {/if}
     <div id="data" class="data">
         <TransactionTable transactions={displayTransactions}
-                        rowsVisible={pageSize}
+                        pagerInfo={`${page + 1} / ${pageCount}`}
                         on:transactionDoubleClick={transactionTableRowDbClick}
-                        bind:resetSelection></TransactionTable>
+                        bind:resetSelection
+
+                        on:nextPageClick={() => {loadTransactionPage(1)}}
+                        on:prevPageClick={() => {loadTransactionPage(-1)}}></TransactionTable>
     </div>
     <div class="action-panel">
         {#if saving}
@@ -171,11 +174,6 @@
                         on:transactionSubmit={transactionInputSubmit} 
                         on:transactionEditStart={transactionInputStart}
                         on:transactionCancel={transactionInputCancel}></TransactionInput>
-        </div>
-        <div>
-            <button class="button-outlined" on:click={() => {loadTransactionPage(-1)}}>&#x276E;</button>
-            <span>{`${page + 1} / ${pageCount}`}</span>
-            <button class="button-outlined" on:click={() => {loadTransactionPage(1)}}>&#x276F;</button>
         </div>
     </div>
 </div>
