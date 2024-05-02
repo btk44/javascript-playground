@@ -5,6 +5,7 @@
 	import TransactionEdit from '../components/transaction-edit.svelte';
 	import CategoryTable from '../components/category-table.svelte';
 	import { initDataStore } from '../services/store';
+	import TransactionTable_2 from '../components/transaction-table-2.svelte';
 
     let dataLoaded = false
 
@@ -25,7 +26,8 @@
     {#if dataLoaded}
     <div class="transactions">
         <Card>
-            <TransactionEdit></TransactionEdit>
+            <TransactionTable_2></TransactionTable_2>
+            <!-- <TransactionEdit></TransactionEdit> -->
         </Card>
     </div>
     <div class="accounts">
