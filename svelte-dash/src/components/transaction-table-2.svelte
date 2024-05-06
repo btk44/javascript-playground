@@ -4,12 +4,13 @@
 	import { onMount } from 'svelte';
 	import { TransactionService } from '../services/transaction-service';
 	import { type TransactionSearchFilters } from '../models/transaction-search-filters';
+	import TransactionInput_2 from './transaction-input-2.svelte';
 
     const headers = ['data', 'konto', 'kategoria', 'kwota', '-', 'komentarz'] 
     const accounts = $accountStoreReadOnly 
     const categories = $categoryStoreReadOnly
     const accountCurrency = accountCurrencyMap()
-    const pageSize = 15
+    const pageSize = 10
 
     let displayTransactions: Array<Transaction> = []
     let dataLoaded = false
@@ -41,9 +42,9 @@
 
         if(dateFilterText.length){
             const dateStrings = dateFilterText.split(',')
-            console.log(dateStrings.length)
-            console.log(Date.parse(dateStrings[0]))
-            console.log(dateStrings[1])
+            // console.log(dateStrings.length)
+            // console.log(Date.parse(dateStrings[0]))
+            // console.log(dateStrings[1])
             //this is all wrong - welcome fucking timezones and time formats!
             if (dateStrings.length > 0 && !isNaN(Date.parse(dateStrings[0]))) { searchFilters.dateFrom = getDate(dateStrings[0])}
             if (dateStrings.length > 1 && !isNaN(Date.parse(dateStrings[1]))) { searchFilters.dateTo = getDate(dateStrings[1]) }
@@ -66,9 +67,7 @@
         }
 
         if (commentFilterText.length){ searchFilters.comment = commentFilterText }
-
-        console.log(searchFilters)
-
+        
         return searchFilters
     }
 
@@ -128,7 +127,7 @@
             <td class="aln-l w-20pc">{formatDate(transaction.date)}</td>
             <td class="aln-l w-20pc">{accounts[transaction.accountId]?.name ?? ''}</td>
             <td class="aln-l w-20pc">{categories[transaction.categoryId]?.name ?? ''}</td>
-            <td class="aln-l w-10pc">{formatAmount(transaction.amount)}</td>
+            <td class="aln-r w-10pc"><span>{formatAmount(transaction.amount)}</span></td>
             <td class="aln-l w-10pc">{accountCurrency[transaction.accountId] ?? ''}</td>
             <td class="aln-l w-20pc">{transaction.comment}</td>
         </tr>
@@ -154,20 +153,23 @@
         </tr>
     </table>
     <div class="actions">
-        {#if filtersVisible}
-        <button class="button-outlined" on:click={() => { filtersConfirmed() }}>&#x2699;</button>
-        {/if}
-        <button class="button-outlined" on:click={() => { filtersClick() }}>&#x2637;</button>
-        <button class="button-outlined" disabled={page === 0} on:click={() => { loadTransactionPage(-1) }}>&#x276E;</button>
-        <div>{`${page + 1} / ${pageCount}`}</div>
-        <button class="button-outlined" disabled={page + 1 === pageCount} on:click={() => { loadTransactionPage(1) }}>&#x276F;</button>
+        <TransactionInput_2></TransactionInput_2>
+        <div class="buttons">
+            {#if filtersVisible}
+            <button class="button-outlined" on:click={() => { filtersConfirmed() }}>&#x2699;</button>
+            {/if}
+            <button class="button-outlined" on:click={() => { filtersClick() }}>&#x2637;</button>
+            <button class="button-outlined" disabled={page === 0} on:click={() => { loadTransactionPage(-1) }}>&#x276E;</button>
+            <div>{`${page + 1} / ${pageCount}`}</div>
+            <button class="button-outlined" disabled={page + 1 === pageCount} on:click={() => { loadTransactionPage(1) }}>&#x276F;</button>
+        </div>
     </div>
 </div>
 
 <style lang="scss">
     @import '../styles/app.scss';
-    
-    .actions { margin: 10px; display: flex; align-items: center; gap: 10px; justify-content: end;}
+    .actions { margin: 5px; display: flex; align-items: flex-start; justify-content: space-between;}
+    .buttons { display: flex; align-items: flex-start; gap: 10px; justify-content: end; div { line-height: $control-min-height; } }
     .selected { background-color: $accent-color-light;}
     input { width: 100%;}
     .hidden { visibility: hidden;}

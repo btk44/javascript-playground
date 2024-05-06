@@ -22,9 +22,9 @@
         {#each Object.entries(accounts) as [accountId, account]}
         {#if account.active}
         <tr>
-            <td class="aln-l w-10pc">{accountId}</td>
-            <td class="aln-l w-35pc">{account.name}</td>
-            <td class="aln-l w-30pc">{formatAmount(account.amount)}</td>
+            <td class="aln-c w-10pc">{accountId}</td>
+            <td class="aln-l w-50pc">{account.name}</td>
+            <td class="aln-r w-30pc">{formatAmount(account.amount)}</td>
             <td class="aln-l w-10pc">{accountCurrency[accountId] ?? ''}</td>
         </tr>
         {/if}
@@ -36,6 +36,4 @@
     @import '../styles/app.scss';
     
     .data{ overflow-y: auto; height: 100%;} 
-    .inactive { background-color: $accent-color-light;}
-    tr { position: relative; }
 </style>

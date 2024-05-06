@@ -7,7 +7,7 @@
 
     .card {
         background-color: $background-color;
-        padding: 5px;
+        padding: 5px 5px 20px 5px;
         box-shadow: $control-box-shadow;
         display: flex;
         flex-direction: column;

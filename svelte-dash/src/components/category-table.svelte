@@ -19,14 +19,14 @@
 <div class="data">
     <table>
         <tr>
-            {#each headers as header}
-            <th class="aln-l">{header}</th>
-            {/each}
+            <th colspan="2" class="aln-l">{headers[0]}</th>
+            <th class="aln-l">{headers[1]}</th>
         </tr>
         {#each categories as category}
         <tr>
-            <td class="aln-l w-10pc">{category.parentId > 0 ? '-->' : category.id}</td>
-            <td class="aln-l w-90pc">{(category.parentId > 0 ? category.id + '  :  ' : '') + category.name}</td>
+            <td class="aln-c w-15pc">{@html category.parentId > 0 ? '.' : category.id}</td>
+            <td class="aln-c w-15pc">{@html category.parentId > 0 ? category.id : '.'}</td>
+            <td class="aln-l w-70pc">{category.name}</td>
         </tr>
         {/each}
     </table>
@@ -35,5 +35,5 @@
 <style lang="scss">
     @import '../styles/app.scss';
     
-    .data{ overflow-y: auto; height: 100%;} 
+    .data{ overflow-y: auto; height: 100%; } 
 </style>

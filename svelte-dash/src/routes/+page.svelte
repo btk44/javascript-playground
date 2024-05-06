@@ -6,6 +6,7 @@
 	import CategoryTable from '../components/category-table.svelte';
 	import { initDataStore } from '../services/store';
 	import TransactionTable_2 from '../components/transaction-table-2.svelte';
+	import TransactionInput_2 from '../components/transaction-input-2.svelte';
 
     let dataLoaded = false
 
@@ -30,6 +31,11 @@
             <!-- <TransactionEdit></TransactionEdit> -->
         </Card>
     </div>
+    <!-- <div class="transaction-input">
+        <Card>
+            <TransactionInput_2></TransactionInput_2>
+        </Card>
+    </div> -->
     <div class="accounts">
         <Card>
             <AccountTable></AccountTable>
@@ -60,15 +66,20 @@
     // main page styles
     $header-size: 60px;
     $side-size: 200px;
+    $grid-row-size: calc(100vh/6 - 8px/4 - 16px); // recalculate it again! (to do)
 
     .test { 
             background-color: lightgray;
             display: grid; 
             grid-template-columns: 2.5fr 1fr;
-            grid-template-rows: calc(50vh - 8px - 16px) calc(50vh - 8px - 16px) ;
+            grid-template-rows: $grid-row-size $grid-row-size $grid-row-size $grid-row-size $grid-row-size $grid-row-size;
             grid-template-areas: 
             "transactions accounts"
-            "transactions categories";
+            "transactions accounts"
+            "transactions accounts"
+            "transactions categories"
+            "transactions categories"
+            "trans-input categories";
             gap: 16px;
             position: relative;
             margin: 0;
@@ -77,22 +88,23 @@
             height: calc(100vh - 0px);
 
             .transactions{ grid-area: transactions; }
+            .transaction-input { grid-area: trans-input; }
             .accounts { grid-area: accounts }
             .categories { grid-area: categories }
     }
 
-    @media (width <= $mobile-width) {
-        .test { 
-            grid-template-columns: 1fr;
-            grid-template-rows: calc(50vh - 8px - 16px) calc(50vh - 8px - 16px) ;
-            grid-template-areas: 
-            "transactions"
-            "transactions";
+    // @media (width <= $mobile-width) {
+    //     .test { 
+    //         grid-template-columns: 1fr;
+    //         grid-template-rows: calc(50vh - 8px - 16px) calc(50vh - 8px - 16px) ;
+    //         grid-template-areas: 
+    //         "transactions"
+    //         "transactions";
 
-            .accounts { display: none;}
-            .categories { display: none; }
-        }
-    }    
+    //         .accounts { display: none;}
+    //         .categories { display: none; }
+    //     }
+    // }    
 
     .main-page {
         // * {
