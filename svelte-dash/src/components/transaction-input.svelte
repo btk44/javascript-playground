@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { GetEmptyTransaction, type Transaction }  from '../models/transaction'
 	import { createEventDispatcher } from 'svelte';
-    import { accountStoreReadOnly, categoryStoreReadOnly } from '../services/store';
+    import { accountStoreReadOnly, categoryStoreReadOnly, reloadAccount } from '../services/store';
+	import { TransactionService } from '../services/transaction-service';
 
     const inputId = 'transaction-input'
 
@@ -14,22 +15,33 @@
             currentInput =  ''
     }
 
-    export let readonly: boolean
-    export let disabled: boolean
-    export const focus = () => { document.getElementById(inputId).focus() }
-    export const blur = () => { document.getElementById(inputId).blur() }
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    let transaction: Transaction = GetEmptyTransaction()
+    let currentInput: string = ''
 
     const dispatch = createEventDispatcher();
     const isNumber = (input: string): boolean => { return !isNaN(+input) }
     const resetErrorFlags = () => { accountError = categoryError = amountError = false }
-    const accounts = $accountStoreReadOnly
+    const accounts = $accountStoreReadOnly 
     const categories = $categoryStoreReadOnly
+
+    const defaultAccountText = 'konto*'
+    const defaultCategoryText = 'kategoria*'
+    const defaultAmountText = 'kwota*'
+    const defaultCommentText = 'komentarz'
+
+    $: amountText = transaction.amount === 0 ? defaultAmountText : transaction.amount
+    $: accountText = transaction.accountId <= 0 ? defaultAccountText : accounts[transaction.accountId].name
+    $: categoryText = transaction.categoryId <= 0 ? defaultCategoryText : categories[transaction.categoryId].name
 
     let accountError = false
     let categoryError = false
     let amountError = false
     $: hasError = categoryError || accountError || amountError
     $: isDataMissing = !(transaction.accountId > 0 && transaction.categoryId > 0)
+
+    let saving = false
 
     const processAccountInput = (inputValue: string | undefined | null): void => {
         if(!inputValue){
@@ -42,6 +54,7 @@
         if(accountId != null && accounts[accountId]) { 
             transaction.accountId = accountId
             accountError = false
+            accountText = accounts[accountId].name
         }
         else {
             transaction.accountId = 0
@@ -60,6 +73,7 @@
         if(categoryId != null && categories[categoryId]) { 
             transaction.categoryId = categoryId
             categoryError = false
+            categoryText = categories[categoryId].name
         }
         else{
             transaction.categoryId = 0
@@ -77,12 +91,18 @@
         if(isNumber(inputValue)){
             amountError = false
             transaction.amount = +inputValue
+            amountText = inputValue
         } 
-        else amountError = true
+        else {
+            amountError = true
+        } 
     }
 
     const processInput = (event: any) => {
         resetErrorFlags()
+        transaction.accountId = 0
+        transaction.categoryId = 0
+        transaction.amount = 0
 
         let currentInput = event.target.value
 
@@ -101,49 +121,54 @@
                                                   .replace(inputValues[2], '').trim()
 
                 if(event.key === 'Enter') inputSubmit()
-                else inputUpdate()
             }
         }
     }
 
-    const inputFocus = () => dispatch('transactionEditStart')
-    const inputBlur = () => dispatch('transactionEditStop')
-    const inputUpdate = () => dispatch('transactionChange', { transaction })
-
-    const inputSubmit = () => {
+    const inputSubmit = async () => {
         if(!hasError && !isDataMissing){
-            dispatch('transactionSubmit', { transaction })
+            try{
+                saving = true
+                await sleep(1000)
+                transaction.id =  (await TransactionService.SaveTransactions([transaction]))[0].id
+                await reloadAccount(1, transaction.accountId)
+                dispatch('transactionSubmit', { transaction })
+                transaction = GetEmptyTransaction()
+                currentInput = ''
+            }
+            catch { 
+                alert('server error')
+            } finally {
+                saving = false
+            }
         }
     }
+
     const inputCancel = () => {
         currentInput = ''
         resetErrorFlags()
         dispatch('transactionCancel')
+        transaction = GetEmptyTransaction()
     }
-
-    let transaction: Transaction = GetEmptyTransaction()
-    let currentInput: string = ''
 </script>
 <div class="transaction-input">
+    {#if saving}
+    <div class="mask"><div class="loader"></div></div>
+    {/if}
     <div class="input-group">
         <input type="text" name={inputId} id={inputId} placeholder="0 0 -0.00 xxxx" 
                 on:keyup={processInput} 
-                on:focus={inputFocus}
-                on:blur={inputBlur} 
                 bind:value={currentInput}
-                readonly={readonly}
-                disabled={disabled}/>
-        <label for={inputId}>
-            <span class={accountError ? 'error-text': ''}>konto*</span>
-            <span class={categoryError ? 'error-text': ''}>kategoria*</span>
-            <span class={amountError ? 'error-text': ''}>kwota*</span>
-            <span>płatnik</span>
-        </label>
+                autocomplete="off"/>
+        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isDataMissing}>&#x2713;</button>
+        <button class="button-outlined" on:click={inputCancel}>&#x2715;</button>
     </div>
-    <div class="button-group">
-        <button class="button-outlined" on:click={inputSubmit} disabled={hasError || isDataMissing || disabled}>&#x2713;</button>
-        <button class="button-outlined" on:click={inputCancel} disabled={disabled}>&#x2715;</button>
-    </div>
+    <label for={inputId}>
+        <span class={accountError ? 'error-text': ''}>{accountText}</span>\
+        <span class={categoryError ? 'error-text': ''}>{categoryText}</span>\
+        <span class={amountError ? 'error-text': ''}>{amountText}</span>\
+        <span>{transaction.comment.length > 0 ? transaction.comment : defaultCommentText}</span>
+    </label>
 </div>
 
 
@@ -151,13 +176,13 @@
     @import '../styles/app.scss';
 
     .transaction-input {  
-        display: flex; gap: 5px; flex-direction: row; justify-content: left;
-        .input-group { display: flex; flex-direction: column; align-items: center;
-                       flex-grow: 0; }
-        .button-group { display: flex; gap: inherit; align-items: flex-start; 
-                        flex-grow: 0; }
+        position: relative;
+        display: flex; gap: 5px; flex-direction: column; justify-content: center;
+        .input-group { display: flex; flex-direction: row; gap: 10px; }
     }
 
-    input { width: 400px; text-align: center;}
-    label { margin-top: 5px;}
+    input { width: 400px; }
+    label { width: 400px; margin: 0 5px; display: flex; flex-direction: row; gap: 10px; 
+            span { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: inline-block; }  
+          }
 </style>

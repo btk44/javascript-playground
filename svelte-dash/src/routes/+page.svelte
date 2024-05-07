@@ -2,11 +2,9 @@
 	import { onMount } from 'svelte';
     import AccountTable from '../components/account-table.svelte';
     import Card from '../components/card.svelte';
-	import TransactionEdit from '../components/transaction-edit.svelte';
 	import CategoryTable from '../components/category-table.svelte';
 	import { initDataStore } from '../services/store';
-	import TransactionTable_2 from '../components/transaction-table-2.svelte';
-	import TransactionInput_2 from '../components/transaction-input-2.svelte';
+	import TransactionTable from '../components/transaction-table.svelte';
 
     let dataLoaded = false
 
@@ -27,15 +25,9 @@
     {#if dataLoaded}
     <div class="transactions">
         <Card>
-            <TransactionTable_2></TransactionTable_2>
-            <!-- <TransactionEdit></TransactionEdit> -->
+            <TransactionTable></TransactionTable>
         </Card>
     </div>
-    <!-- <div class="transaction-input">
-        <Card>
-            <TransactionInput_2></TransactionInput_2>
-        </Card>
-    </div> -->
     <div class="accounts">
         <Card>
             <AccountTable></AccountTable>
@@ -66,20 +58,16 @@
     // main page styles
     $header-size: 60px;
     $side-size: 200px;
-    $grid-row-size: calc(100vh/6 - 8px/4 - 16px); // recalculate it again! (to do)
+    $grid-row-size: calc(50vh - 8px - 16px); // recalculate it again! (to do)
 
     .test { 
             background-color: lightgray;
             display: grid; 
             grid-template-columns: 2.5fr 1fr;
-            grid-template-rows: $grid-row-size $grid-row-size $grid-row-size $grid-row-size $grid-row-size $grid-row-size;
+            grid-template-rows: $grid-row-size $grid-row-size;
             grid-template-areas: 
             "transactions accounts"
-            "transactions accounts"
-            "transactions accounts"
-            "transactions categories"
-            "transactions categories"
-            "trans-input categories";
+            "transactions categories";
             gap: 16px;
             position: relative;
             margin: 0;
